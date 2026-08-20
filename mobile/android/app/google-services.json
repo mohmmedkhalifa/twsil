@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "303301506528",
+    "project_id": "twsil-db653",
+    "storage_bucket": "twsil-db653.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:303301506528:android:10076f8e2b0c71539aa785",
+        "android_client_info": {
+          "package_name": "com.twsil.twsil_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM20bBSyxrKI4j8ZwAQACm0nDkPkvzLqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

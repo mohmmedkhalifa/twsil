@@ -1,0 +1,38 @@
+name: twsil_mobile
+description: "تطبيق توصيل اللامركزي - شحن وتسليم الطرود"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  flutter_bloc: ^9.0.0
+  dio: ^5.7.0
+  http: ^1.2.2
+  http_parser: ^4.1.0
+  mime: ^2.0.0
+  shared_preferences: ^2.3.3
+  socket_io_client: ^3.0.2
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  image_picker: ^1.1.2
+  geolocator: ^13.0.2
+  uuid: ^4.5.1
+  cupertino_icons: ^1.0.8
+  firebase_core: ^4.13.0
+  firebase_messaging: ^16.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true

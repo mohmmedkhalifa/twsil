@@ -1,0 +1,16 @@
+
+# Secrets - never commit
+firebase-service-account.json
+.env
+uploads/
+
+# Dependencies & build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local databases & logs
+*.db
+*.db-*
+*.sqlite
+*.log

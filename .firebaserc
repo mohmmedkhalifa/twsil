@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "twsil-db653"
+  },
+  "targets": {
+    "twsil-db653": {
+      "hosting": {
+        "app": [
+          "twsil-app"
+        ],
+        "admin": [
+          "twsil-db653"
+        ]
+      }
+    }
+  }
+}
