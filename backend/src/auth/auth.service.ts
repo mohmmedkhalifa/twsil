@@ -63,19 +63,35 @@ export class AuthService {
     return this.issueToken(user);
   }
 
-  private async register(dto: RegisterCustomerDto, role: UserRole) {
-    if (!dto.phone || !dto.password || !dto.firstName || !dto.lastName) {
+  private async register(dto: any, role: UserRole) {
+    // Normalize across all clients (Mobile/Web/Admin, old builds): accept aliases
+    const phone = String(dto.phone ?? dto.identifier ?? dto.mobile ?? '').trim();
+    const rawPassword: unknown = dto.password ?? dto.pass ?? dto.pwd ?? dto.passwordHash;
+    const password = rawPassword == null ? '' : String(rawPassword);
+    const firstName = String(dto.firstName ?? dto.first_name ?? dto.name ?? '').trim();
+    const lastName = String(dto.lastName ?? dto.last_name ?? '').trim();
+    const locale: string = dto.locale ?? 'ar';
+
+    if (!phone || !password || !firstName || !lastName) {
       throw new BadRequestException('All fields are required');
     }
-    const exists = await this.usersRepo.findOne({ where: { phone: dto.phone } });
+    if (password.length < 6) {
+      throw new BadRequestException('Password must be at least 6 characters');
+    }
+
+    const exists = await this.usersRepo.findOne({ where: { phone } });
     if (exists) throw new BadRequestException('Phone number is already registered');
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    if (!passwordHash) throw new BadRequestException('Failed to hash password');
+
     const user = this.usersRepo.create({
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      phone: dto.phone,
-      passwordHash: await bcrypt.hash(dto.password, 10),
+      firstName,
+      lastName,
+      phone,
+      passwordHash,
       role,
-      locale: dto.locale ?? 'ar',
+      locale,
     });
     const saved = await this.usersRepo.save(user);
     delete (saved as Partial<User>).passwordHash;
