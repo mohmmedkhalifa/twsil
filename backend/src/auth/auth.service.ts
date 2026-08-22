@@ -52,9 +52,10 @@ export class AuthService {
       plateNumber: dto.plateNumber,
       nationalId: dto.nationalId,
       city: dto.city,
-      verificationStatus: VerificationStatus.Approved,
-      isAvailable: true,
-      isActive: true,
+      verificationStatus: VerificationStatus.Pending,
+      subscriptionStatus: SubscriptionStatus.Inactive,
+      isAvailable: false,
+      isActive: false,
     });
     await this.captainsRepo.save(profile);
     return this.issueToken(user);

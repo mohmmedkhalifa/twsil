@@ -47,8 +47,16 @@ export class CaptainsService {
   async update(userId: string, dto: UpdateCaptainDto) {
     const profile = await this.captainsRepo.findOne({ where: { userId } });
     if (!profile) throw new NotFoundException('Captain profile not found');
-    if (dto.isAvailable === true && profile.subscriptionStatus !== SubscriptionStatus.Active) {
-      throw new BadRequestException('Your subscription must be active to receive orders');
+    if (dto.isAvailable === true) {
+      if (profile.verificationStatus !== VerificationStatus.Approved) {
+        throw new BadRequestException('حسابك قيد المراجعة والتوثيق من قبل الإدارة ولم يتم توثيقه بعد');
+      }
+      if (!profile.isActive) {
+        throw new BadRequestException('حسابك موقوف مؤقتاً من قبل الإدارة');
+      }
+      if (profile.subscriptionStatus !== SubscriptionStatus.Active) {
+        throw new BadRequestException('يجب تفعيل اشتراكك الشهري لتتمكن من استقبال الطلبات');
+      }
     }
     await this.captainsRepo.update(profile.id, {
       ...(dto.transportType ? { transportType: dto.transportType as never } : {}),
@@ -66,8 +74,16 @@ export class CaptainsService {
   async setAvailability(userId: string, isAvailable: boolean) {
     const profile = await this.captainsRepo.findOne({ where: { userId } });
     if (!profile) throw new NotFoundException('Captain profile not found');
-    if (isAvailable && profile.subscriptionStatus !== SubscriptionStatus.Active) {
-      throw new BadRequestException('Your subscription must be active to receive orders');
+    if (isAvailable) {
+      if (profile.verificationStatus !== VerificationStatus.Approved) {
+        throw new BadRequestException('حسابك قيد المراجعة والتوثيق من قبل الإدارة ولم يتم توثيقه بعد');
+      }
+      if (!profile.isActive) {
+        throw new BadRequestException('حسابك موقوف مؤقتاً من قبل الإدارة');
+      }
+      if (profile.subscriptionStatus !== SubscriptionStatus.Active) {
+        throw new BadRequestException('يجب تفعيل اشتراكك الشهري لتتمكن من استقبال الطلبات');
+      }
     }
     await this.captainsRepo.update(profile.id, { isAvailable });
     await this.broadcastAvailability(userId);
