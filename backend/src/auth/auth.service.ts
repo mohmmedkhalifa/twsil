@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User, UserRole } from '../database/entities/user.entity';
-import { CaptainProfile, TransportType, VerificationStatus } from '../database/entities/captain-profile.entity';
+import { CaptainProfile, SubscriptionStatus, TransportType, VerificationStatus } from '../database/entities/captain-profile.entity';
 
 export class RegisterCustomerDto {
   firstName: string;
