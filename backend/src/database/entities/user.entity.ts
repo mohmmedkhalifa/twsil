@@ -33,7 +33,7 @@ export class User {
   @Column({ type: 'text', nullable: true })
   email: string | null;
 
-  @Column({ select: false, nullable: true })
+  @Column({ select: false })
   passwordHash: string;
 
   @Column({ type: 'simple-enum', enum: UserRole, default: UserRole.Customer })
