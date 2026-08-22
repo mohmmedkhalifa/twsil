@@ -3,10 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Admin client for the Twsil NestJS backend.
-/// No Supabase: one source of truth (backend owns DB + realtime).
+/// Production default points to the live Render backend.
 final String adminApiBase = const String.fromEnvironment(
   'ADMIN_API_URL',
-  defaultValue: 'http://localhost:4000/api',
+  defaultValue: 'https://twsil-api.onrender.com/api',
 );
 
 class AApi {
