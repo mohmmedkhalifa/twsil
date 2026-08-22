@@ -138,8 +138,11 @@ export class AdminService {
     return { ...profile, subscriptions, deliveredCount: delivered };
   }
 
-  async reviewCaptainVerification(userId: string, adminId: string, dto: ReviewCaptainVerificationDto) {
-    const profile = await this.captainsRepo.findOne({ where: { userId }, relations: { user: true } });
+  async reviewCaptainVerification(idOrUserId: string, adminId: string, dto: ReviewCaptainVerificationDto) {
+    const profile = await this.captainsRepo.findOne({
+      where: [{ userId: idOrUserId }, { id: idOrUserId }],
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Captain profile not found');
     if (dto.action === 'approve') {
       profile.verificationStatus = VerificationStatus.Approved;
@@ -155,7 +158,7 @@ export class AdminService {
     }
     await this.captainsRepo.save(profile);
     await this.notifications.push(
-      [userId],
+      [profile.userId],
       dto.action === 'approve' ? 'captain:verified' : 'captain:verification_rejected',
       dto.action === 'approve' ? 'تم توثيق حسابك ✅' : 'تم رفض التوثيق',
       dto.note ??
@@ -167,14 +170,16 @@ export class AdminService {
     return profile;
   }
 
-  async toggleCaptainActive(userId: string) {
-    const profile = await this.captainsRepo.findOne({ where: { userId } });
+  async toggleCaptainActive(idOrUserId: string) {
+    const profile = await this.captainsRepo.findOne({
+      where: [{ userId: idOrUserId }, { id: idOrUserId }],
+    });
     if (!profile) throw new NotFoundException('Captain profile not found');
     profile.isActive = !profile.isActive;
     if (!profile.isActive) profile.isAvailable = false;
     await this.captainsRepo.save(profile);
     await this.notifications.push(
-      [userId],
+      [profile.userId],
       profile.isActive ? 'captain:activated' : 'captain:deactivated',
       profile.isActive ? 'تم تفعيل حسابك ✅' : 'تم إيقاف حسابك',
       profile.isActive

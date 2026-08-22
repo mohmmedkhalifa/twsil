@@ -1,0 +1,259 @@
+[debug] [2026-08-22T12:28:54.855Z] ----------------------------------------------------------------------
+[debug] [2026-08-22T12:28:54.857Z] Command:       /home/mohammedk/.hermes/node/bin/node /usr/bin/firebase deploy --only hosting
+[debug] [2026-08-22T12:28:54.858Z] CLI Version:   15.26.0
+[debug] [2026-08-22T12:28:54.858Z] Platform:      linux
+[debug] [2026-08-22T12:28:54.858Z] Node Version:  v22.23.2
+[debug] [2026-08-22T12:28:54.858Z] Detected Agent: antigravity
+[debug] [2026-08-22T12:28:54.858Z] Time:          Sat Aug 22 2026 15:28:54 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-08-22T12:28:54.859Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-22T12:28:56.525Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-22T12:28:56.525Z] > authorizing via signed-in user (moh.k.khalifa0@gmail.com)
+[debug] [2026-08-22T12:28:56.526Z] [iam] checking project twsil-db653 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-08-22T12:28:56.557Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:56.557Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:56.560Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/twsil-db653:testIamPermissions [none]
+[debug] [2026-08-22T12:28:56.561Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/twsil-db653:testIamPermissions  x-goog-user-project=twsil-db653
+[debug] [2026-08-22T12:28:56.561Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/twsil-db653:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-08-22T12:28:57.284Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/twsil-db653:testIamPermissions 200
+[debug] [2026-08-22T12:28:57.285Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/twsil-db653:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-08-22T12:28:57.286Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:57.286Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:57.286Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/twsil-db653 [none]
+[debug] [2026-08-22T12:28:58.366Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/twsil-db653 200
+[debug] [2026-08-22T12:28:58.367Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/twsil-db653 {"projectId":"twsil-db653","projectNumber":"303301506528","displayName":"twsil","name":"projects/twsil-db653","resources":{"hostingSite":"twsil-db653"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_da52dc2f-43c7-45f5-aaba-4d72faf1be6f"}
+[info] 
+[info] === Deploying to 'twsil-db653'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-08-22T12:28:58.375Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:58.376Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:58.376Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:58.377Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:28:58.377Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-app [none]
+[debug] [2026-08-22T12:28:58.380Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-db653 [none]
+[debug] [2026-08-22T12:29:00.318Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-app 200
+[debug] [2026-08-22T12:29:00.318Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-app {"name":"projects/twsil-db653/sites/twsil-app","defaultUrl":"https://twsil-app.web.app","type":"USER_SITE"}
+[debug] [2026-08-22T12:29:00.326Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:00.327Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:00.331Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions [none]
+[debug] [2026-08-22T12:29:00.331Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-22T12:29:00.618Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-db653 200
+[debug] [2026-08-22T12:29:00.618Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/twsil-db653/sites/twsil-db653 {"name":"projects/twsil-db653/sites/twsil-db653","defaultUrl":"https://twsil-db653.web.app","appId":"1:303301506528:web:09439d9d1161bd5f9aa785","type":"DEFAULT_SITE"}
+[debug] [2026-08-22T12:29:00.624Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:00.624Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:00.631Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions [none]
+[debug] [2026-08-22T12:29:00.632Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-22T12:29:01.933Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions 200
+[debug] [2026-08-22T12:29:01.933Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions {"name":"projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-22T12:29:02.742Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions 200
+[debug] [2026-08-22T12:29:02.743Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions {"name":"projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[twsil-app]: beginning deploy... 
+[info] i  hosting[twsil-app]: found 39 files in mobile/build/web 
+[debug] [2026-08-22T12:29:02.834Z] [hosting] uploading with 200 concurrency
+[debug] [2026-08-22T12:29:03.840Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:03.840Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:03.842Z] [hosting] hash cache [bW9iaWxlL2J1aWxkL3dlYg] stored for 39 files
+[debug] [2026-08-22T12:29:03.842Z] [hosting][hash queue][FINAL] {"max":991,"min":33,"avg":214.17948717948718,"active":0,"complete":39,"success":39,"errored":0,"retried":0,"total":39,"elapsed":1003}
+[debug] [2026-08-22T12:29:03.843Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0:populateFiles [none]
+[debug] [2026-08-22T12:29:03.843Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0:populateFiles {"files":{"/version.json":"23d3e7b1db1598fe8e0ce55893f9e458ec1bed86560c1620dfd18359d30ed20a","/manifest.json":"1d88a1751a48fbcf61d3d58434d2409de28b0ff50130998b4fe88f23a2fe71f4","/index.html":"9a532fd325ea3cf7d25c75e7194572a814505fbf1d58953b6f25b66be26cdfbd","/flutter_service_worker.js":"e1f4135191a080af3d1ba569557b5277252b9b9423a6be83c963274d08d39f5f","/favicon.png":"18f5974cf0a7a778cc393e3cb31725d0a85970c8df2b52688cacce7e4dc99342","/flutter_bootstrap.js":"bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c","/flutter.js":"c86e9ec2a28b0fa50e6efcc196aec60be02c96a5b0bec888ea7e1c986d1b8c68","/icons/Icon-512.png":"7fdb40ad7ef7200d89786b1266b41d441eea7872d4bdccaf8a954429aab62c5f","/icons/Icon-maskable-192.png":"3b3af8b09702ed3f063219466bd9e044dbd2703372b1402f6632920ba9c251de","/icons/Icon-192.png":"2a485edb60e647cf0496f958c90c1ebdb3b9a82dc44260370b9094842fab3906","/assets/FontManifest.json":"00798c3c5766cdc753371ca1934749c9fe9b8969de56bc54e9ed1c90b3d669fa","/assets/AssetManifest.bin.json":"1e8b63c71f3fefeaa2a81ea7054f9258f62c32679c5838bc3d9172ceac66e265","/assets/AssetManifest.bin":"cc0465508a12c65a607ee204e7b7598fb6a04dd0a406e85c9068d498aecbafbd","/assets/shaders/stretch_effect.frag":"c85d689154c452aecb4d715217c9b62ac0ed9372e696808db52af9c26ec04fc4","/assets/shaders/ink_sparkle.frag":"f75750b05040bb9642c8ab2782af899f7c105dd1bd1300d8e4a38ce6c761b329","/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf":"10aa1f084fa7612decf021fb5a8aefa4a7d2f427d7a02fa778962dd20b814c29","/assets/fonts/MaterialIcons-Regular.otf":"8389a45eac7c2a9ec5e6d5ae04f2914ed6cd2c6c2bc751b8a986b7806a32c495","/icons/Icon-maskable-512.png":"8d3ccbc9307d2a1ede82dddcd23c11d39a00be576296b9358903ee746206cde2","/canvaskit/wimp.js":"f33e408b578c5ec3977b783cda5df88265f8e6c24d7e61cce845066bdaf5e3eb","/assets/packages/flutter_map/lib/assets/flutter_map_logo.png":"bf01389d49b3edaed8df28cfdc30cbd271858993f536fba0a1af06adadbb2acc","/canvaskit/skwasm_heavy.js":"2d687d56274b5d707130c93c3c60b83a348f67c73768cf79184fcfc8d152b1a2","/canvaskit/skwasm.js":"7e8991a9f606a949918bf3db0fd07605093eb37a62c7a1bd1fbbec04456a253a","/canvaskit/canvaskit.js":"8f05e5d17d7914a40c211fde070c3128a76ab2c8bac4e571742c0c7a976c1776","/canvaskit/experimental_webparagraph/canvaskit.js":"86e81e359267b7c4b0cfa1a7e871c61b16941f9ca60f2e54ff09be89aae9c0fc","/canvaskit/chromium/canvaskit.js":"d875cb49ece3ae13d5c74282f1e8da660cfb088f0ca5b7993bb2fadafd88e6ed","/assets/NOTICES":"f375af893f14ace46fbceab323a79b5f190eba9c05872659dddbbff9be73510b","/canvaskit/experimental_webparagraph/canvaskit.js.symbols":"051a2332f5a73b53ef847f27640b7af0ab69be5d42408b0c17dde4d96252f480","/canvaskit/chromium/canvaskit.js.symbols":"ba83b007d3a50765bafaadecb3514469a9cd22f2b1a7a99ddd7438f60db641c6","/canvaskit/canvaskit.js.symbols":"6c43803c56f8ce231be200d0411ffa016639654f269fe2190170e55311e89f00","/canvaskit/skwasm.js.symbols":"d884ac636086f6a2a88615ff3c65c1b48a24055dfdb7c24915532cdb5aab149b","/canvaskit/wimp.js.symbols":"3be2131e03ce6141007dcba791929add2d00774b2921d1aaa8208c8e9b4ee2dd","/canvaskit/skwasm_heavy.js.symbols":"eca693f246ea148ffec8ffad0fe591195732c31b420f7b682d3834fd81ef453f","/canvaskit/wimp.wasm":"5be42e57b8c2b522957de520ae47c108a7fa16f5a1dd38f2586802195b5d5415","/canvaskit/skwasm.wasm":"17c32e48928595c6862bfa6add1dfb78a4ed6ed7b917f772d07534f03a69d1f7","/main.dart.js":"4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455","/canvaskit/experimental_webparagraph/canvaskit.wasm":"e40eee418e82b1e16f80fc36aa120a200d5d9c2c157a6fc0ac3ae20e37667167","/canvaskit/chromium/canvaskit.wasm":"dd121babc7a174df8afdaad1a58cd86bb6c30fc19ff6784635876ca1e594b35a","/canvaskit/skwasm_heavy.wasm":"9f8be233980e811d09040a3b9b68b6933b53040be738cd2f7673cff95cd9753a","/canvaskit/canvaskit.wasm":"dc4d10e405dcb1d7b22fe53450f45a6da52e19a1a4eb724e688c33941cccf4fc"}}
+[debug] [2026-08-22T12:29:04.727Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0:populateFiles 200
+[debug] [2026-08-22T12:29:04.727Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0:populateFiles {"uploadRequiredHashes":["4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455","bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files"}
+[debug] [2026-08-22T12:29:04.730Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:04.730Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:04.732Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:04.733Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:04.734Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455 [none]
+[debug] [2026-08-22T12:29:04.734Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455 [stream]
+[debug] [2026-08-22T12:29:04.740Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c [none]
+[debug] [2026-08-22T12:29:04.740Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c [stream]
+[debug] [2026-08-22T12:29:04.751Z] [hosting][populate queue][FINAL] {"max":894,"min":894,"avg":894,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":912}
+[debug] [2026-08-22T12:29:04.752Z] [hosting] uploads queued: 2
+[info] i  hosting: uploading new files [0/2] (0%) 
+[info] i  hosting: uploading new files [0/2] (0%) 
+[info] i  hosting: uploading new files [0/2] (0%) 
+[debug] [2026-08-22T12:29:09.293Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c 200
+[debug] [2026-08-22T12:29:09.293Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/bc3e604466d3d312458bf2f189608499c49abe739c4d14585b0d7328fd171b1c [stream]
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[debug] [2026-08-22T12:29:22.485Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455 200
+[debug] [2026-08-22T12:29:22.485Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-app/versions/53568db91c94d1a0/files/4f6c904d5d59becc05291b8ba5c90582d50ed563a1f102880045555d41fce455 [stream]
+[debug] [2026-08-22T12:29:22.488Z] [hosting][upload queue][FINAL] {"max":17760,"min":4564,"avg":11162,"active":0,"complete":2,"success":2,"errored":0,"retried":0,"total":2,"elapsed":17760}
+[info] i  hosting: upload complete 
+[info] ✔  hosting[twsil-app]: file upload complete 
+[debug] [2026-08-22T12:29:22.492Z] [hosting] deploy completed after 19735ms
+[info] i  hosting[twsil-db653]: beginning deploy... 
+[info] i  hosting[twsil-db653]: found 38 files in admin/build/web 
+[debug] [2026-08-22T12:29:22.516Z] [hosting] uploading with 200 concurrency
+[debug] [2026-08-22T12:29:23.625Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:23.626Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:23.634Z] [hosting] hash cache [YWRtaW4vYnVpbGQvd2Vi] stored for 38 files
+[debug] [2026-08-22T12:29:23.634Z] [hosting][hash queue][FINAL] {"max":1101,"min":27,"avg":230.57894736842104,"active":0,"complete":38,"success":38,"errored":0,"retried":0,"total":38,"elapsed":1117}
+[debug] [2026-08-22T12:29:23.635Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d:populateFiles [none]
+[debug] [2026-08-22T12:29:23.636Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d:populateFiles {"files":{"/version.json":"5a0c0b879ce8b8369e3c8c5240592c672eec4693520da1344018e2b12bad95c4","/manifest.json":"de6e6789671f02d59ae18ed173fa028c4c90802387d4628049a11aba1b75455a","/index.html":"0cbb34ca44853e978b5d236324ae215a72677cd95c0bbdbe333e3e23b8f0129f","/flutter_service_worker.js":"e1f4135191a080af3d1ba569557b5277252b9b9423a6be83c963274d08d39f5f","/favicon.png":"18f5974cf0a7a778cc393e3cb31725d0a85970c8df2b52688cacce7e4dc99342","/flutter_bootstrap.js":"360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24","/flutter.js":"c86e9ec2a28b0fa50e6efcc196aec60be02c96a5b0bec888ea7e1c986d1b8c68","/icons/Icon-maskable-192.png":"3b3af8b09702ed3f063219466bd9e044dbd2703372b1402f6632920ba9c251de","/icons/Icon-192.png":"2a485edb60e647cf0496f958c90c1ebdb3b9a82dc44260370b9094842fab3906","/icons/Icon-512.png":"7fdb40ad7ef7200d89786b1266b41d441eea7872d4bdccaf8a954429aab62c5f","/assets/AssetManifest.bin.json":"6dab3bc22d8651a5fa292a09e03cfd63b9c06be7d92099be1e7c492a94623f6b","/assets/AssetManifest.bin":"8b6072cd7e29821eb7524c128faf9c41e69579e2a2fc8dd76b5140802f2e0de6","/assets/FontManifest.json":"00798c3c5766cdc753371ca1934749c9fe9b8969de56bc54e9ed1c90b3d669fa","/assets/shaders/stretch_effect.frag":"c85d689154c452aecb4d715217c9b62ac0ed9372e696808db52af9c26ec04fc4","/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf":"10aa1f084fa7612decf021fb5a8aefa4a7d2f427d7a02fa778962dd20b814c29","/assets/shaders/ink_sparkle.frag":"f75750b05040bb9642c8ab2782af899f7c105dd1bd1300d8e4a38ce6c761b329","/icons/Icon-maskable-512.png":"8d3ccbc9307d2a1ede82dddcd23c11d39a00be576296b9358903ee746206cde2","/canvaskit/wimp.js":"f33e408b578c5ec3977b783cda5df88265f8e6c24d7e61cce845066bdaf5e3eb","/assets/fonts/MaterialIcons-Regular.otf":"771fcf38561527578216673657961ccac65c13b2df6aa3abb2bec36823224d40","/canvaskit/skwasm_heavy.js":"2d687d56274b5d707130c93c3c60b83a348f67c73768cf79184fcfc8d152b1a2","/canvaskit/skwasm.js":"7e8991a9f606a949918bf3db0fd07605093eb37a62c7a1bd1fbbec04456a253a","/canvaskit/experimental_webparagraph/canvaskit.js":"86e81e359267b7c4b0cfa1a7e871c61b16941f9ca60f2e54ff09be89aae9c0fc","/canvaskit/canvaskit.js":"8f05e5d17d7914a40c211fde070c3128a76ab2c8bac4e571742c0c7a976c1776","/canvaskit/chromium/canvaskit.js":"d875cb49ece3ae13d5c74282f1e8da660cfb088f0ca5b7993bb2fadafd88e6ed","/assets/NOTICES":"9a4527f5ef5310b2fb7aa3b1e0868faaef213ba71d060dbccfb65b8505e933cf","/canvaskit/experimental_webparagraph/canvaskit.js.symbols":"051a2332f5a73b53ef847f27640b7af0ab69be5d42408b0c17dde4d96252f480","/canvaskit/chromium/canvaskit.js.symbols":"ba83b007d3a50765bafaadecb3514469a9cd22f2b1a7a99ddd7438f60db641c6","/canvaskit/canvaskit.js.symbols":"6c43803c56f8ce231be200d0411ffa016639654f269fe2190170e55311e89f00","/canvaskit/skwasm.js.symbols":"d884ac636086f6a2a88615ff3c65c1b48a24055dfdb7c24915532cdb5aab149b","/canvaskit/wimp.js.symbols":"3be2131e03ce6141007dcba791929add2d00774b2921d1aaa8208c8e9b4ee2dd","/canvaskit/skwasm_heavy.js.symbols":"eca693f246ea148ffec8ffad0fe591195732c31b420f7b682d3834fd81ef453f","/main.dart.js":"87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151","/canvaskit/wimp.wasm":"5be42e57b8c2b522957de520ae47c108a7fa16f5a1dd38f2586802195b5d5415","/canvaskit/experimental_webparagraph/canvaskit.wasm":"e40eee418e82b1e16f80fc36aa120a200d5d9c2c157a6fc0ac3ae20e37667167","/canvaskit/skwasm.wasm":"17c32e48928595c6862bfa6add1dfb78a4ed6ed7b917f772d07534f03a69d1f7","/canvaskit/chromium/canvaskit.wasm":"dd121babc7a174df8afdaad1a58cd86bb6c30fc19ff6784635876ca1e594b35a","/canvaskit/skwasm_heavy.wasm":"9f8be233980e811d09040a3b9b68b6933b53040be738cd2f7673cff95cd9753a","/canvaskit/canvaskit.wasm":"dc4d10e405dcb1d7b22fe53450f45a6da52e19a1a4eb724e688c33941cccf4fc"}}
+[info] i  hosting: adding files to version [0/38] (0%) 
+[debug] [2026-08-22T12:29:25.338Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d:populateFiles 200
+[debug] [2026-08-22T12:29:25.339Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d:populateFiles {"uploadRequiredHashes":["360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24","87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files"}
+[debug] [2026-08-22T12:29:25.341Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:25.341Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:25.341Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:25.342Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:25.342Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24 [none]
+[debug] [2026-08-22T12:29:25.342Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24 [stream]
+[debug] [2026-08-22T12:29:25.344Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151 [none]
+[debug] [2026-08-22T12:29:25.344Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151 [stream]
+[debug] [2026-08-22T12:29:25.346Z] [hosting][populate queue][FINAL] {"max":1719,"min":1719,"avg":1719,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1723}
+[debug] [2026-08-22T12:29:25.347Z] [hosting] uploads queued: 2
+[info] i  hosting: uploading new files [0/2] (0%) 
+[debug] [2026-08-22T12:29:26.805Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24 200
+[debug] [2026-08-22T12:29:26.805Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/360c2a2ff00a9d190665d90f1c7bcdeade226480e33fd9377ee8be46b1d48f24 [stream]
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[info] i  hosting: uploading new files [1/2] (50%) 
+[debug] [2026-08-22T12:29:56.445Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151 200
+[debug] [2026-08-22T12:29:56.445Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/twsil-db653/versions/93dad1936072f44d/files/87937f51573f0d7e46ee32c0e3f0950aa9f0165ca2f0e40647af26c5286e1151 [stream]
+[debug] [2026-08-22T12:29:56.445Z] [hosting][upload queue][FINAL] {"max":31104,"min":1465,"avg":16284.5,"active":0,"complete":2,"success":2,"errored":0,"retried":0,"total":2,"elapsed":31105}
+[info] i  hosting: upload complete 
+[info] ✔  hosting[twsil-db653]: file upload complete 
+[debug] [2026-08-22T12:29:56.445Z] [hosting] deploy completed after 33951ms
+[debug] [2026-08-22T12:29:56.446Z] [
+  {
+    "config": {
+      "site": "twsil-app",
+      "public": "mobile/build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/*.map"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        },
+        {
+          "source": "**/index.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, must-revalidate"
+            }
+          ]
+        }
+      ]
+    },
+    "version": "projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0"
+  },
+  {
+    "config": {
+      "site": "twsil-db653",
+      "public": "admin/build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/*.map"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        },
+        {
+          "source": "**/index.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, must-revalidate"
+            }
+          ]
+        }
+      ]
+    },
+    "version": "projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d"
+  }
+]
+[info] i  hosting[twsil-app]: finalizing version... 
+[info] i  hosting[twsil-db653]: finalizing version... 
+[debug] [2026-08-22T12:29:56.449Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:56.449Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:56.450Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:56.450Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:56.451Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions/53568db91c94d1a0 updateMask=status%2Cconfig
+[debug] [2026-08-22T12:29:56.451Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions/53568db91c94d1a0 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}],"headers":[{"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)","headers":{"Cache-Control":"public, max-age=31536000, immutable"}},{"glob":"**/index.html","headers":{"Cache-Control":"no-cache, no-store, must-revalidate"}}]}}
+[debug] [2026-08-22T12:29:56.452Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions/93dad1936072f44d updateMask=status%2Cconfig
+[debug] [2026-08-22T12:29:56.452Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions/93dad1936072f44d {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}],"headers":[{"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)","headers":{"Cache-Control":"public, max-age=31536000, immutable"}},{"glob":"**/index.html","headers":{"Cache-Control":"no-cache, no-store, must-revalidate"}}]}}
+[debug] [2026-08-22T12:29:59.241Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions/53568db91c94d1a0 200
+[debug] [2026-08-22T12:29:59.242Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/versions/53568db91c94d1a0 {"name":"projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:00.774890Z","createUser":{"email":"moh.k.khalifa0@gmail.com"},"finalizeTime":"2026-08-22T12:29:58.990349Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com"}}
+[debug] [2026-08-22T12:29:59.242Z] [hosting] finalized version for twsil-app:[object Object]
+[info] ✔  hosting[twsil-app]: version finalized 
+[info] i  hosting[twsil-app]: releasing new version... 
+[debug] [2026-08-22T12:29:59.244Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:59.245Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:29:59.245Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/channels/live/releases versionName=projects%2F303301506528%2Fsites%2Ftwsil-app%2Fversions%2F53568db91c94d1a0
+[debug] [2026-08-22T12:29:59.246Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/channels/live/releases {}
+[debug] [2026-08-22T12:30:00.065Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions/93dad1936072f44d 200
+[debug] [2026-08-22T12:30:00.065Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/versions/93dad1936072f44d {"name":"projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:01.251641Z","createUser":{"email":"moh.k.khalifa0@gmail.com"},"finalizeTime":"2026-08-22T12:29:59.808403Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com"}}
+[debug] [2026-08-22T12:30:00.066Z] [hosting] finalized version for twsil-db653:[object Object]
+[info] ✔  hosting[twsil-db653]: version finalized 
+[info] i  hosting[twsil-db653]: releasing new version... 
+[debug] [2026-08-22T12:30:00.067Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:30:00.068Z] Checked if tokens are valid: true, expires at: 1787403589529
+[debug] [2026-08-22T12:30:00.068Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/channels/live/releases versionName=projects%2F303301506528%2Fsites%2Ftwsil-db653%2Fversions%2F93dad1936072f44d
+[debug] [2026-08-22T12:30:00.068Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/channels/live/releases {}
+[debug] [2026-08-22T12:30:01.303Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/channels/live/releases 200
+[debug] [2026-08-22T12:30:01.304Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-app/channels/live/releases {"name":"projects/303301506528/sites/twsil-app/channels/live/releases/1787401799434000","version":{"name":"projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:00.774890Z","createUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"},"finalizeTime":"2026-08-22T12:29:58.990349Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}},"type":"DEPLOY","releaseTime":"2026-08-22T12:29:59.434Z","releaseUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}}
+[debug] [2026-08-22T12:30:01.305Z] [hosting] release: {"name":"projects/303301506528/sites/twsil-app/channels/live/releases/1787401799434000","version":{"name":"projects/303301506528/sites/twsil-app/versions/53568db91c94d1a0","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:00.774890Z","createUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"},"finalizeTime":"2026-08-22T12:29:58.990349Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}},"type":"DEPLOY","releaseTime":"2026-08-22T12:29:59.434Z","releaseUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}}
+[info] ✔  hosting[twsil-app]: release complete 
+[debug] [2026-08-22T12:30:01.593Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/channels/live/releases 200
+[debug] [2026-08-22T12:30:01.594Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/twsil-db653/channels/live/releases {"name":"projects/303301506528/sites/twsil-db653/channels/live/releases/1787401800381000","version":{"name":"projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:01.251641Z","createUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"},"finalizeTime":"2026-08-22T12:29:59.808403Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}},"type":"DEPLOY","releaseTime":"2026-08-22T12:30:00.381Z","releaseUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}}
+[debug] [2026-08-22T12:30:01.595Z] [hosting] release: {"name":"projects/303301506528/sites/twsil-db653/channels/live/releases/1787401800381000","version":{"name":"projects/303301506528/sites/twsil-db653/versions/93dad1936072f44d","status":"FINALIZED","config":{"headers":[{"headers":{"Cache-Control":"public, max-age=31536000, immutable"},"glob":"**/*.@(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|wasm)"},{"headers":{"Cache-Control":"no-cache, no-store, must-revalidate"},"glob":"**/index.html"}],"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-08-22T12:29:01.251641Z","createUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"},"finalizeTime":"2026-08-22T12:29:59.808403Z","finalizeUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}},"type":"DEPLOY","releaseTime":"2026-08-22T12:30:00.381Z","releaseUser":{"email":"moh.k.khalifa0@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocKOS7Y6r805hUOk_MpGzct9gAAxnX1lASYSNBuA3hTE8IndDS4"}}
+[info] ✔  hosting[twsil-db653]: release complete 
+[info] 
+[info] ✔  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/twsil-db653/overview
+[info] Hosting URL: https://twsil-app.web.app
+[info] Hosting URL: https://twsil-db653.web.app
+[debug] [2026-08-22T12:30:07.055Z] Error: Timed out.
+    at Timeout._onTimeout (/usr/lib/node_modules/firebase-tools/lib/utils.js:296:49)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[error] 
+[error] Error: An unexpected error has occurred.

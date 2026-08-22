@@ -333,15 +333,17 @@ class AApi {
       final u = (m['user'] as Map? ?? {}).map((k, v) => MapEntry(k.toString(), v));
       final vs = m['verificationStatus']?.toString() ?? '';
       final userPhone = u['phone']?.toString() ?? '';
+      final realUserId = m['userId']?.toString() ?? u['id']?.toString() ?? m['id']?.toString() ?? '';
       return <String, dynamic>{
         ...m,
+        'userId': realUserId,
         'user': <String, dynamic>{
           ...u,
-          'id': m['userId'],
+          'id': realUserId,
           'phone': userPhone,
         },
-        'idCardUrl': m['nationalIdCardImageUrl'] ?? m['idCardUrl'] ?? m['idCardImageUrl'] ?? m['id_card_url'] ?? u['avatarUrl'],
-        'licenseUrl': m['licenseImageUrl'] ?? m['licenseUrl'] ?? m['license_url'] ?? u['avatarUrl'],
+        'idCardUrl': m['nationalIdCardImageUrl'] ?? m['idCardUrl'] ?? m['idCardImageUrl'] ?? m['id_card_url'] ?? '',
+        'licenseUrl': m['licenseImageUrl'] ?? m['licenseUrl'] ?? m['license_url'] ?? '',
         'receiptImageUrl': m['receiptImageUrl'] ?? m['receiptUrl'] ?? m['subscriptionReceiptUrl'] ?? '',
         'verificationStatus': vs == 'approved'
             ? 'verification_approved'
@@ -446,11 +448,26 @@ class AApi {
   // ------------------------------------------------------------- misc
 
   String imageUrl(String url) {
-    if (url.isEmpty) return '';
-    if (url.startsWith('http')) return url;
+    if (url.isEmpty || url == 'null') return '';
+    var clean = url.trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+    if (clean.startsWith('/')) clean = clean.substring(1);
+
+    const supabaseBase = 'https://ymqtrsnikcicywxtfjsx.supabase.co/storage/v1/object/public/twsil-images';
+
+    if (clean.startsWith('twsil-images/')) {
+      return '$supabaseBase/${clean.substring(13)}';
+    }
+
+    if (clean.startsWith('uploads/') ||
+        clean.startsWith('receipts/') ||
+        clean.startsWith('identity/') ||
+        clean.startsWith('licenses/')) {
+      return '$supabaseBase/$clean';
+    }
+
     final base = Uri.parse(_apiBase).origin;
-    if (url.startsWith('/')) return '$base$url';
-    return '$base/$url';
+    return '$base/$clean';
   }
 
   Future<void> seedDemoData() async {

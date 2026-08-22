@@ -49,19 +49,25 @@ export class UploadController {
       },
     }),
   )
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('folder') folder?: string,
+    @Body('category') category?: string,
+  ) {
     if (!file) throw new BadRequestException('File is required');
+    const targetFolder = (folder || category || '').toLowerCase();
+    const folderName = targetFolder === 'receipts' ? 'receipts' : 'uploads';
     const key = `${Date.now()}-${uuid()}${extname(file.originalname ?? '')}`;
-    const fileName = `receipts/${key}`;
+    const fileName = `${folderName}/${key}`;
 
     if (this.s3.enabled) {
       const url = await this.s3.put(fileName, file.buffer, file.mimetype);
       return { url };
     }
 
-    const dest = join(process.cwd(), UPLOAD_DIR, 'receipts');
+    const dest = join(process.cwd(), UPLOAD_DIR, folderName);
     fs.mkdirSync(dest, { recursive: true });
     fs.writeFileSync(join(dest, key), file.buffer);
-    return { url: `${baseUrl()}/${UPLOAD_DIR}/receipts/${key}` };
+    return { url: `${baseUrl()}/${UPLOAD_DIR}/${folderName}/${key}` };
   }
 }

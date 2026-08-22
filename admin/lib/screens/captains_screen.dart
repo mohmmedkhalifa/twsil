@@ -40,7 +40,15 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
   }
 
   Future<void> _reviewVerification(Map<String, dynamic> captain, String action) async {
-    final userId = (captain['user'] ?? {})['id'] ?? captain['userId'];
+    final userId = captain['userId']?.toString() ??
+        (captain['user'] as Map?)?['id']?.toString() ??
+        captain['id']?.toString();
+
+    if (userId == null || userId.isEmpty || userId == 'null') {
+      snack(context, 'تعذر تحديد معرّف الكابتن', error: true);
+      return;
+    }
+
     final noteCtrl = TextEditingController();
     showDialog(
       context: context,
@@ -79,7 +87,15 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
   }
 
   Future<void> _toggleActive(Map<String, dynamic> captain) async {
-    final userId = (captain['user'] ?? {})['id'] ?? captain['userId'];
+    final userId = captain['userId']?.toString() ??
+        (captain['user'] as Map?)?['id']?.toString() ??
+        captain['id']?.toString();
+
+    if (userId == null || userId.isEmpty || userId == 'null') {
+      snack(context, 'تعذر تحديد معرّف الكابتن', error: true);
+      return;
+    }
+
     final isActive = captain['isActive'] == true;
     try {
       await AApi.instance.post('/admin/captains/$userId/toggle-active');

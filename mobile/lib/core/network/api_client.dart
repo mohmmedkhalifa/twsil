@@ -190,7 +190,7 @@ class ApiClient {
     return s;
   }
 
-  Future<String> uploadImageBytes(Uint8List bytes, String filename, {String? mimeType}) async {
+  Future<String> uploadImageBytes(Uint8List bytes, String filename, {String? mimeType, String? category, String? folder}) async {
     final rawName = filename.split('/').last;
     final extMatch = RegExp(r'\.([a-zA-Z0-9]+)$').firstMatch(rawName);
     final ext = extMatch != null ? extMatch.group(1)!.toLowerCase() : 'jpg';
@@ -202,6 +202,11 @@ class ApiClient {
       'Accept': 'application/json',
       if (_token != null && _token!.isNotEmpty) 'Authorization': 'Bearer $_token',
     });
+
+    final targetFolder = folder ?? (category == 'receipts' ? 'receipts' : 'uploads');
+    request.fields['folder'] = targetFolder;
+    request.fields['category'] = targetFolder;
+
     request.files.add(
       http.MultipartFile.fromBytes(
         'file',
@@ -225,21 +230,43 @@ class ApiClient {
     );
   }
 
-  Future<String> uploadXFile(XFile xFile, {String? category}) async {
+  Future<String> uploadXFile(XFile xFile, {String? category, String? folder}) async {
     final bytes = await xFile.readAsBytes();
-    return uploadImageBytes(bytes, xFile.name, mimeType: xFile.mimeType);
+    return uploadImageBytes(bytes, xFile.name, mimeType: xFile.mimeType, category: category, folder: folder);
   }
 
   Future<String> uploadImage(String filePath, {String folder = 'uploads', String? category, String? captainId, XFile? xFile}) async {
     if (xFile != null) {
-      return uploadXFile(xFile, category: category);
+      return uploadXFile(xFile, category: category, folder: folder);
     }
     if (kIsWeb) {
       throw ApiException('يرجى اختيار صورة صالحة للرفع في المتصفح');
     }
     final file = File(filePath);
     final bytes = await file.readAsBytes();
-    return uploadImageBytes(bytes, filePath);
+    return uploadImageBytes(bytes, filePath, category: category, folder: folder);
+  }
+
+  static String imageUrl(String url) {
+    if (url.isEmpty || url == 'null') return '';
+    var clean = url.trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+    if (clean.startsWith('/')) clean = clean.substring(1);
+
+    const supabaseBase = 'https://ymqtrsnikcicywxtfjsx.supabase.co/storage/v1/object/public/twsil-images';
+
+    if (clean.startsWith('twsil-images/')) {
+      return '$supabaseBase/${clean.substring(13)}';
+    }
+
+    if (clean.startsWith('uploads/') ||
+        clean.startsWith('receipts/') ||
+        clean.startsWith('identity/') ||
+        clean.startsWith('licenses/')) {
+      return '$supabaseBase/$clean';
+    }
+
+    return '$apiBaseUrl/$clean';
   }
 
   Future<dynamic> get(String path, {Map<String, String>? query}) =>
