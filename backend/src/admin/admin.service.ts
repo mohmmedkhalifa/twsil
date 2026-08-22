@@ -144,9 +144,14 @@ export class AdminService {
     if (dto.action === 'approve') {
       profile.verificationStatus = VerificationStatus.Approved;
       profile.verificationNote = dto.note ?? null;
+      profile.isActive = true;
+      profile.idCardVerified = true;
+      profile.licenseVerified = true;
     } else {
       profile.verificationStatus = VerificationStatus.Rejected;
       profile.verificationNote = dto.note ?? null;
+      profile.isActive = false;
+      profile.isAvailable = false;
     }
     await this.captainsRepo.save(profile);
     await this.notifications.push(

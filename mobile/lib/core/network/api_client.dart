@@ -1,7 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config.dart';
@@ -27,6 +29,13 @@ class ApiClient {
   User? user;
 
   static const Duration _timeout = Duration(seconds: 15);
+
+  String _cleanPath(String path) {
+    var p = path.trim();
+    if (p.startsWith('/api')) p = p.substring(4);
+    if (!p.startsWith('/')) p = '/$p';
+    return p;
+  }
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -94,9 +103,10 @@ class ApiClient {
     Map<String, dynamic>? body,
     Map<String, String>? query,
     bool auth = true,
+    Duration? timeout,
   }) async {
     try {
-      final cleanPath = path.startsWith('/') ? path : '/$path';
+      final cleanPath = _cleanPath(path);
       final uri = Uri.parse('$apiBaseUrl$cleanPath').replace(queryParameters: query);
 
       final headers = <String, String>{
@@ -106,11 +116,7 @@ class ApiClient {
           'Authorization': 'Bearer $_token',
       };
 
-      // Login/register may legitimately be slow on weak mobile networks,
-      // so give them a generous timeout instead of the fast one.
-      final isAuthRequest = cleanPath.startsWith('/auth/login') ||
-          cleanPath.startsWith('/auth/register');
-      final t = isAuthRequest ? const Duration(seconds: 45) : _timeout;
+      final t = timeout ?? _timeout;
 
       http.Response res;
       switch (method.toUpperCase()) {
@@ -184,14 +190,11 @@ class ApiClient {
     return s;
   }
 
-  /// Uploads an image to the backend (`POST /api/upload/image`).
-  Future<String> uploadImage(String filePath, {String folder = 'uploads', String? category, String? captainId}) async {
-    final file = File(filePath);
-    final bytes = await file.readAsBytes();
-    final rawName = filePath.split('/').last;
+  Future<String> uploadImageBytes(Uint8List bytes, String filename, {String? mimeType}) async {
+    final rawName = filename.split('/').last;
     final extMatch = RegExp(r'\.([a-zA-Z0-9]+)$').firstMatch(rawName);
     final ext = extMatch != null ? extMatch.group(1)!.toLowerCase() : 'jpg';
-    final mimeType = lookupMimeType(filePath) ?? 'image/jpeg';
+    final resolvedMime = mimeType ?? lookupMimeType(filename) ?? 'image/jpeg';
 
     final uri = Uri.parse('$apiBaseUrl/upload/image');
     final request = http.MultipartRequest('POST', uri);
@@ -204,7 +207,7 @@ class ApiClient {
         'file',
         bytes,
         filename: 'upload.$ext',
-        contentType: MediaType.parse(mimeType),
+        contentType: MediaType.parse(resolvedMime),
       ),
     );
 
@@ -220,6 +223,23 @@ class ApiClient {
       _errorMessage(res.statusCode, decoded),
       statusCode: res.statusCode,
     );
+  }
+
+  Future<String> uploadXFile(XFile xFile, {String? category}) async {
+    final bytes = await xFile.readAsBytes();
+    return uploadImageBytes(bytes, xFile.name, mimeType: xFile.mimeType);
+  }
+
+  Future<String> uploadImage(String filePath, {String folder = 'uploads', String? category, String? captainId, XFile? xFile}) async {
+    if (xFile != null) {
+      return uploadXFile(xFile, category: category);
+    }
+    if (kIsWeb) {
+      throw ApiException('يرجى اختيار صورة صالحة للرفع في المتصفح');
+    }
+    final file = File(filePath);
+    final bytes = await file.readAsBytes();
+    return uploadImageBytes(bytes, filePath);
   }
 
   Future<dynamic> get(String path, {Map<String, String>? query}) =>

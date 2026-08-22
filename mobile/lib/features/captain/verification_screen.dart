@@ -20,7 +20,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1600);
     if (picked == null) return;
     try {
-      final url = await ApiClient.instance.uploadImage(picked.path, category: isId ? 'identity' : 'licenses');
+      final url = await ApiClient.instance.uploadXFile(picked, category: isId ? 'identity' : 'licenses');
       if (!mounted) return;
       setState(() {
         if (isId) {

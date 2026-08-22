@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1400);
     if (picked == null) return;
     try {
-      final url = await ApiClient.instance.uploadImage(picked.path);
+      final url = await ApiClient.instance.uploadXFile(picked);
       await ApiClient.instance.post('/chats/$_conversationId/messages', body: {
         'imageUrl': url,
       });

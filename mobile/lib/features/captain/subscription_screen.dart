@@ -256,7 +256,7 @@ class _ReceiptUploaderState extends State<ReceiptUploader> {
     if (picked == null) return;
     setState(() => _uploading = true);
     try {
-      final url = await ApiClient.instance.uploadImage(picked.path, category: 'receipts');
+      final url = await ApiClient.instance.uploadXFile(picked, category: 'receipts');
       if (!mounted) return;
       setState(() {
         _url = url;
