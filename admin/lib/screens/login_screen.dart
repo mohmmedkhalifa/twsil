@@ -131,13 +131,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 22),
                       TextField(
                         controller: _phone,
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.telephoneNumber],
+                        autofillHints: const [AutofillHints.telephoneNumber, AutofillHints.email],
                         onSubmitted: (_) => _login(),
                         decoration: const InputDecoration(
-                          labelText: 'رقم الهاتف',
-                          prefixIcon: Icon(Icons.phone_outlined),
+                          labelText: 'رقم الهاتف أو البريد الإلكتروني',
+                          prefixIcon: Icon(Icons.person_outline),
                         ),
                       ),
                       const SizedBox(height: 14),

@@ -96,16 +96,16 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const phone = (dto.phone ?? '').trim();
-    if (!phone) {
-      throw new UnauthorizedException('Phone number is required');
+    const identifier = String(dto.phone ?? (dto as any).identifier ?? (dto as any).email ?? '').trim();
+    if (!identifier) {
+      throw new UnauthorizedException('Phone number or email is required');
     }
     const user = await this.usersRepo.findOne({
-      where: { phone },
+      where: [{ phone: identifier }, { email: identifier }],
       select: { id: true, passwordHash: true, role: true, phone: true, email: true, isBanned: true, firstName: true, lastName: true, avatarUrl: true, locale: true },
     });
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
-      throw new UnauthorizedException('Invalid phone or password');
+      throw new UnauthorizedException('Invalid credentials');
     }
     if (user.isBanned) throw new UnauthorizedException('Your account has been suspended');
     return this.issueToken(user);
