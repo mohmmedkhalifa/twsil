@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final phoneStr = _phone.text.trim();
     final passStr = _password.text;
     if (phoneStr.isEmpty || passStr.isEmpty) {
-      setState(() => _error = 'يرجى إدخال رقم الهاتف أو البريد الإلكتروني وكلمة المرور');
+      setState(() => _error = 'يرجى إدخال رقم الهاتف وكلمة المرور');
       return;
     }
 
@@ -131,13 +131,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 22),
                       TextField(
                         controller: _phone,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.email],
+                        autofillHints: const [AutofillHints.telephoneNumber],
                         onSubmitted: (_) => _login(),
                         decoration: const InputDecoration(
-                          labelText: 'رقم الهاتف أو البريد الإلكتروني',
-                          prefixIcon: Icon(Icons.person_outline),
+                          labelText: 'رقم الهاتف',
+                          prefixIcon: Icon(Icons.phone_outlined),
                         ),
                       ),
                       const SizedBox(height: 14),

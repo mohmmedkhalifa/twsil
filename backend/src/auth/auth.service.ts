@@ -26,10 +26,7 @@ export class RegisterCaptainDto extends RegisterCustomerDto {
 }
 
 export class LoginDto {
-  /** Either the phone number or the email address. */
-  phone?: string;
-  /** Alias accepted by clients that send `identifier`. */
-  identifier?: string;
+  phone: string;
   password: string;
 }
 
@@ -99,14 +96,12 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const raw = (dto.phone ?? dto.identifier ?? '').trim();
-    const identifier = raw.toLowerCase();
-    const isEmail = identifier.includes('@');
-    if (!identifier) {
-      throw new UnauthorizedException('Identifier (phone or email) is required');
+    const phone = (dto.phone ?? '').trim();
+    if (!phone) {
+      throw new UnauthorizedException('Phone number is required');
     }
     const user = await this.usersRepo.findOne({
-      where: isEmail ? { email: identifier } : { phone: raw },
+      where: { phone },
       select: { id: true, passwordHash: true, role: true, phone: true, email: true, isBanned: true, firstName: true, lastName: true, avatarUrl: true, locale: true },
     });
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
