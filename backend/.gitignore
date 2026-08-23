@@ -2,7 +2,7 @@
 # Secrets - never commit
 firebase-service-account.json
 .env
-uploads/
+/uploads/
 
 # Dependencies & build output
 node_modules/
