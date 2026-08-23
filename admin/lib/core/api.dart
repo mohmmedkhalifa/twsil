@@ -101,7 +101,6 @@ class AApi {
   Future<dynamic> patch(String path, {Map<String, dynamic>? body}) =>
       request('PATCH', path, body: body);
   Future<dynamic> delete(String path) => request('DELETE', path);
-
   Future<dynamic> request(
     String method,
     String path, {
@@ -142,6 +141,9 @@ class AApi {
       case '/admin/users':
         return _adminUsers(query?['role']);
 
+      case '/admin/admins':
+        return _httpGet('/admin/admins');
+
       case '/orders/admin/list':
         return _orders(query?['status']);
 
@@ -150,6 +152,11 @@ class AApi {
 
       case '/admin/reviews':
         return _reviews();
+    }
+
+    final userDelete = RegExp(r'^/admin/users/([^/]+)/?$').firstMatch(path);
+    if (userDelete != null && method == 'DELETE') {
+      return _httpDelete('/admin/users/${userDelete.group(1)}');
     }
 
     final payReview = RegExp(r'^/orders/admin/payments/(.+)/review$').firstMatch(path);
@@ -273,6 +280,11 @@ class AApi {
     return _httpRequest(
       () => _client.patch(uri, headers: _headers(write: true), body: jsonEncode(body)),
     );
+  }
+
+  Future<dynamic> _httpDelete(String path) {
+    final uri = Uri.parse('$_apiBase$path');
+    return _httpRequest(() => _client.delete(uri, headers: _headers(write: true)));
   }
 
   // ------------------------------------------------------------- queries (NestJS → screen shapes)
@@ -450,7 +462,14 @@ class AApi {
   String imageUrl(String url) {
     if (url.isEmpty || url == 'null') return '';
     var clean = url.trim();
-    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+    if (clean.startsWith('http://') || clean.startsWith('https://')) {
+      // Legacy localhost URLs must never reach the browser.
+      if (clean.contains('localhost') || clean.contains('127.0.0.1')) {
+        final path = Uri.tryParse(clean)?.path ?? '';
+        return imageUrl(path);
+      }
+      return clean;
+    }
     if (clean.startsWith('/')) clean = clean.substring(1);
 
     const supabaseBase = 'https://ymqtrsnikcicywxtfjsx.supabase.co/storage/v1/object/public/twsil-images';
@@ -459,11 +478,21 @@ class AApi {
       return '$supabaseBase/${clean.substring(13)}';
     }
 
-    if (clean.startsWith('uploads/') ||
-        clean.startsWith('receipts/') ||
-        clean.startsWith('identity/') ||
-        clean.startsWith('licenses/')) {
-      return '$supabaseBase/$clean';
+    const knownFolders = [
+      'identities/',
+      'driving-licenses/',
+      'transfer-receipts/',
+      'delivery-proofs/',
+      'order-images/',
+      'uploads/',
+      'receipts/',
+      'identity/',
+      'licenses/',
+    ];
+    for (final folder in knownFolders) {
+      if (clean.startsWith(folder)) {
+        return '$supabaseBase/$clean';
+      }
     }
 
     final base = Uri.parse(_apiBase).origin;

@@ -26,7 +26,10 @@ export class RegisterCaptainDto extends RegisterCustomerDto {
 }
 
 export class LoginDto {
-  phone: string;
+  /** Phone number (primary) or email address — both accepted. */
+  phone?: string;
+  /** Alias accepted by some clients. */
+  identifier?: string;
   password: string;
 }
 
@@ -97,10 +100,14 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const identifier = String(dto.phone ?? (dto as any).identifier ?? (dto as any).email ?? '').trim();
-    if (!identifier) {
-      throw new UnauthorizedException('Phone number or email is required');
+    const rawInput = String(dto.phone ?? dto.identifier ?? '').trim();
+    if (!rawInput) {
+      throw new BadRequestException('Phone number or email is required');
     }
+    if (!dto.password) throw new BadRequestException('Password is required');
+    // Emails are matched case-insensitively; phones keep their exact form
+    // after trimming whitespace / invisible characters.
+    const identifier = rawInput.includes('@') ? rawInput.toLowerCase() : rawInput;
     const user = await this.usersRepo.findOne({
       where: [{ phone: identifier }, { email: identifier }],
       select: { id: true, passwordHash: true, role: true, phone: true, email: true, isBanned: true, firstName: true, lastName: true, avatarUrl: true, locale: true },

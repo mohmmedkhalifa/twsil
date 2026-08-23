@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/polling.dart';
@@ -135,6 +136,14 @@ class _OrdersPageState extends State<OrdersPage> with PollingMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Align(
+                                      alignment: AlignmentDirectional.centerEnd,
+                                      child: TextButton.icon(
+                                        onPressed: () => context.go('/admin/orders/${o['id']}'),
+                                        icon: const Icon(Icons.open_in_new, size: 15),
+                                        label: const Text('فتح صفحة الطلب'),
+                                      ),
+                                    ),
                                     const Divider(),
                                     _kv('العميل', '${customer['firstName'] ?? ''} ${customer['lastName'] ?? ''} (${customer['phone'] ?? ''})'),
                                     _kv('العنوان من', o['pickupAddress'] ?? ''),

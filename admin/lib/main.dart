@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/api.dart';
+import 'core/router.dart';
 import 'core/theme.dart';
-import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +23,7 @@ class AdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'توصيل - لوحة التحكم',
       debugShowCheckedModeBanner: false,
       theme: ATheme.light(),
@@ -35,11 +34,7 @@ class AdminApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      initialRoute: AApi.instance.token != null ? '/dashboard' : '/login',
-      routes: {
-        '/login': (_) => const LoginScreen(),
-        '/dashboard': (_) => const DashboardScreen(),
-      },
+      routerConfig: router,
     );
   }
 }
@@ -74,7 +69,7 @@ class _FatalError extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
+                  onPressed: () => router.go('/login'),
                   child: const Text('إعادة المحاولة'),
                 ),
               ],

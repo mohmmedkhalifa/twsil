@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/api.dart';
@@ -70,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await AApi.instance.login(phoneStr, passStr);
       await _saveCredentials();
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/dashboard');
+      context.go('/admin/dashboard');
     } catch (e) {
       if (!mounted) return;
       setState(() {

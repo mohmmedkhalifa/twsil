@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -49,6 +49,16 @@ export class AdminController {
   @Get('users')
   users(@Query('role') role?: string) {
     return this.admin.listUsers(role as UserRole | undefined);
+  }
+
+  @Get('admins')
+  admins() {
+    return this.admin.listAdmins();
+  }
+
+  @Delete('users/:id')
+  deleteUser(@Param('id') id: string) {
+    return this.admin.deleteUser(id);
   }
 
   @Post('users/:id/toggle-ban')

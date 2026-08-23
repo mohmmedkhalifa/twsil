@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/polling.dart';
+import '../core/widgets.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -12,7 +14,11 @@ class UsersPage extends StatefulWidget {
 class _UsersPageState extends State<UsersPage> with PollingMixin {
   List<Map<String, dynamic>> _users = [];
   bool _loading = true;
+  String? _error;
   String _searchQuery = '';
+  String _statusFilter = 'all'; // all | active | banned
+  int _page = 1;
+  static const int _pageSize = 10;
 
   @override
   void initState() {
@@ -25,20 +31,22 @@ class _UsersPageState extends State<UsersPage> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    if (_users.isEmpty) setState(() => _loading = true);
     try {
-      final u = await AApi.instance.get('/admin/users', query: {'role': 'customer'}) as List;
+      // The API enforces regular customers only — captains/admins can never appear.
+      final u = await AApi.instance.get('/admin/users') as List;
       if (!mounted) return;
       setState(() {
-        _users = u
-            .cast<Map<String, dynamic>>()
-            .where((usr) => usr['role'] == 'customer' || usr['role'] == null || usr['role'] == '')
-            .toList();
+        _users = u.cast<Map<String, dynamic>>();
         _loading = false;
+        _error = null;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        _error = ae(e);
+      });
     }
   }
 
@@ -55,83 +63,163 @@ class _UsersPageState extends State<UsersPage> with PollingMixin {
     }
   }
 
+  Future<void> _deleteUser(Map<String, dynamic> user) async {
+    final name =
+        '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
+    final phone = user['phone']?.toString() ?? '';
+    final label = name.isNotEmpty ? '$name (${phone})' : phone;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('حذف المستخدم نهائياً؟'),
+        content: Text(
+          'سيتم حذف حساب «$label» مع كل بياناته المرتبطة:\n'
+          'الطلبات، العروض، المحادثات والرسائل، التقييمات، '
+          'الإشعارات والشكاوى.\n\nهذا الإجراء لا يمكن التراجع عنه.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('إلغاء')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: ATheme.danger),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('حذف نهائي'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await AApi.instance.delete('/admin/users/${user['id']}');
+      if (mounted) {
+        snack(context, 'تم حذف المستخدم $label');
+        _load();
+      }
+    } catch (e) {
+      if (mounted) snack(context, ae(e), error: true);
+    }
+  }
+
   List<Map<String, dynamic>> get _filteredUsers {
-    if (_searchQuery.trim().isEmpty) return _users;
-    final q = _searchQuery.trim().toLowerCase();
-    return _users.where((u) {
-      final name = '${u['firstName'] ?? ''} ${u['lastName'] ?? ''}'.toLowerCase();
-      final phone = (u['phone'] ?? '').toString();
-      final email = (u['email'] ?? '').toString().toLowerCase();
-      return name.contains(q) || phone.contains(q) || email.contains(q);
-    }).toList();
+    Iterable<Map<String, dynamic>> list = _users;
+    if (_statusFilter == 'active') list = list.where((u) => u['isBanned'] != true);
+    if (_statusFilter == 'banned') list = list.where((u) => u['isBanned'] == true);
+    if (_searchQuery.trim().isNotEmpty) {
+      final q = _searchQuery.trim().toLowerCase();
+      list = list.where((u) {
+        final name = '${u['firstName'] ?? ''} ${u['lastName'] ?? ''}'.toLowerCase();
+        final phone = (u['phone'] ?? '').toString();
+        final email = (u['email'] ?? '').toString().toLowerCase();
+        return name.contains(q) || phone.contains(q) || email.contains(q);
+      });
+    }
+    return list.toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final list = _filteredUsers;
+    final pageCount = (list.length / _pageSize).ceil().clamp(1, 9999);
+    if (_page > pageCount) _page = pageCount;
+    final pageItems = list
+        .skip((_page - 1) * _pageSize)
+        .take(_pageSize)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('إدارة المستخدمين العاديين (${_users.length})'),
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
-        ],
+        title: Text('المستخدمون (${list.length})'),
+        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _load)],
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              onChanged: (v) => setState(() => _searchQuery = v),
-              decoration: InputDecoration(
-                hintText: 'بحث بالاسم، رقم الهاتف، أو البريد الإلكتروني...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: (v) => setState(() {
+                      _searchQuery = v;
+                      _page = 1;
+                    }),
+                    decoration: InputDecoration(
+                      hintText: 'بحث بالاسم، رقم الهاتف أو البريد...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'all', label: Text('الكل')),
+                    ButtonSegment(value: 'active', label: Text('نشط')),
+                    ButtonSegment(value: 'banned', label: Text('محظور')),
+                  ],
+                  selected: {_statusFilter},
+                  onSelectionChanged: (s) => setState(() {
+                    _statusFilter = s.first;
+                    _page = 1;
+                  }),
+                ),
+              ],
             ),
           ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: _load,
-                    child: list.isEmpty
-                        ? const Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.person_off_outlined, size: 48, color: Colors.grey),
-                                SizedBox(height: 12),
-                                Text(
-                                  'لا يوجد مستخدمون عاديون مضافون حالياً',
-                                  style: TextStyle(color: Colors.grey, fontSize: 15),
-                                ),
-                              ],
+                : _error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.cloud_off, size: 44, color: ATheme.danger),
+                            const SizedBox(height: 8),
+                            Text(_error!, textAlign: TextAlign.center),
+                            const SizedBox(height: 12),
+                            FilledButton.icon(
+                              onPressed: _load,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('إعادة المحاولة'),
                             ),
+                          ],
+                        ),
+                      )
+                    : pageItems.isEmpty
+                        ? const EmptyState(
+                            icon: Icons.person_off_outlined,
+                            message: 'لا يوجد مستخدمون مطابقون',
                           )
                         : SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
                             child: SizedBox(
                               width: double.infinity,
                               child: DataTable(
+                                horizontalMargin: 20,
                                 columns: const [
                                   DataColumn(label: Text('المستخدم')),
                                   DataColumn(label: Text('رقم الهاتف')),
                                   DataColumn(label: Text('البريد الإلكتروني')),
-                                  DataColumn(label: Text('تاريخ الانضمام')),
+                                  DataColumn(label: Text('تاريخ التسجيل')),
                                   DataColumn(label: Text('الحالة')),
                                   DataColumn(label: Text('الإجراءات')),
                                 ],
-                                rows: list.map((u) {
+                                rows: pageItems.map((u) {
                                   final banned = u['isBanned'] == true;
-                                  final phone = (u['phone']?.toString().isNotEmpty == true) ? u['phone'].toString() : '-';
-                                  final email = (u['email']?.toString().isNotEmpty == true) ? u['email'].toString() : '-';
+                                  final phone =
+                                      (u['phone']?.toString().isNotEmpty == true) ? u['phone'].toString() : '-';
+                                  final email =
+                                      (u['email']?.toString().isNotEmpty == true) ? u['email'].toString() : '-';
                                   final createdAt = u['createdAt'] != null
                                       ? u['createdAt'].toString().split('T').first
                                       : '-';
+                                  final name =
+                                      '${u['firstName'] ?? ''} ${u['lastName'] ?? ''}'.trim();
 
                                   return DataRow(
+                                    onSelectChanged: (_) => context.go('/admin/users/${u['id']}'),
                                     cells: [
                                       DataCell(
                                         Row(
@@ -140,17 +228,11 @@ class _UsersPageState extends State<UsersPage> with PollingMixin {
                                             CircleAvatar(
                                               radius: 16,
                                               backgroundColor: ATheme.primary.withValues(alpha: .1),
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 18,
-                                                color: ATheme.primary,
-                                              ),
+                                              child: const Icon(Icons.person, size: 18, color: ATheme.primary),
                                             ),
                                             const SizedBox(width: 10),
                                             Text(
-                                              '${u['firstName'] ?? ''} ${u['lastName'] ?? ''}'.trim().isEmpty
-                                                  ? 'مستخدم بدون اسم'
-                                                  : '${u['firstName'] ?? ''} ${u['lastName'] ?? ''}',
+                                              name.isEmpty ? 'مستخدم بدون اسم' : name,
                                               style: const TextStyle(fontWeight: FontWeight.w600),
                                             ),
                                           ],
@@ -162,33 +244,27 @@ class _UsersPageState extends State<UsersPage> with PollingMixin {
                                           style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold),
                                         ),
                                       ),
+                                      DataCell(Text(email, style: const TextStyle(color: Colors.black87))),
+                                      DataCell(Text(createdAt, style: const TextStyle(fontSize: 12, color: Colors.grey))),
+                                      DataCell(StatusBadge(label: banned ? 'محظور' : 'نشط', danger: banned)),
                                       DataCell(
-                                        Text(email, style: const TextStyle(color: Colors.black87)),
-                                      ),
-                                      DataCell(
-                                        Text(createdAt, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                                      ),
-                                      DataCell(
-                                        Chip(
-                                          label: Text(banned ? 'محظور' : 'نشط'),
-                                          backgroundColor: (banned ? Colors.red : Colors.green).withValues(alpha: .12),
-                                          labelStyle: TextStyle(
-                                            color: banned ? Colors.red : Colors.green,
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                        ),
-                                      ),
-                                      DataCell(
-                                        OutlinedButton.icon(
-                                          style: OutlinedButton.styleFrom(
-                                            visualDensity: VisualDensity.compact,
-                                            foregroundColor: banned ? ATheme.primary : ATheme.danger,
-                                          ),
-                                          icon: Icon(banned ? Icons.lock_open : Icons.block, size: 16),
-                                          label: Text(banned ? 'إلغاء الحظر' : 'حظر الحساب'),
-                                          onPressed: () => _toggleBan(u),
+                                        Row(
+                                          children: [
+                                            OutlinedButton.icon(
+                                              style: OutlinedButton.styleFrom(
+                                                visualDensity: VisualDensity.compact,
+                                                foregroundColor: banned ? ATheme.primary : ATheme.danger,
+                                              ),
+                                              icon: Icon(banned ? Icons.lock_open : Icons.block, size: 16),
+                                              label: Text(banned ? 'إلغاء الحظر' : 'حظر'),
+                                              onPressed: () => _toggleBan(u),
+                                            ),
+                                            IconButton(
+                                              tooltip: 'حذف المستخدم',
+                                              icon: const Icon(Icons.delete_outline, size: 19, color: ATheme.danger),
+                                              onPressed: () => _deleteUser(u),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -197,8 +273,13 @@ class _UsersPageState extends State<UsersPage> with PollingMixin {
                               ),
                             ),
                           ),
-                  ),
           ),
+          if (!_loading && pageCount > 1)
+            PaginationBar(
+              page: _page,
+              pageCount: pageCount,
+              onChanged: (p) => setState(() => _page = p),
+            ),
         ],
       ),
     );

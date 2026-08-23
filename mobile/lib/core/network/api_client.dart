@@ -190,7 +190,7 @@ class ApiClient {
     return s;
   }
 
-  Future<String> uploadImageBytes(Uint8List bytes, String filename, {String? mimeType, String? category, String? folder}) async {
+  Future<String> uploadImageBytes(Uint8List bytes, String filename, {String? mimeType, String? category, String? folder, String? sub, String? orderId}) async {
     final rawName = filename.split('/').last;
     final extMatch = RegExp(r'\.([a-zA-Z0-9]+)$').firstMatch(rawName);
     final ext = extMatch != null ? extMatch.group(1)!.toLowerCase() : 'jpg';
@@ -203,9 +203,16 @@ class ApiClient {
       if (_token != null && _token!.isNotEmpty) 'Authorization': 'Bearer $_token',
     });
 
-    final targetFolder = folder ?? (category == 'receipts' ? 'receipts' : 'uploads');
-    request.fields['folder'] = targetFolder;
-    request.fields['category'] = targetFolder;
+    // Pass the real category through — the backend maps it onto the
+    // canonical storage layout (identities/, driving-licenses/,
+    // transfer-receipts/, delivery-proofs/, order-images/).
+    final targetFolder = folder ?? category;
+    if (targetFolder != null && targetFolder.isNotEmpty) {
+      request.fields['folder'] = targetFolder;
+      request.fields['category'] = targetFolder;
+    }
+    if (sub != null && sub.isNotEmpty) request.fields['sub'] = sub;
+    if (orderId != null && orderId.isNotEmpty) request.fields['orderId'] = orderId;
 
     request.files.add(
       http.MultipartFile.fromBytes(
@@ -230,21 +237,21 @@ class ApiClient {
     );
   }
 
-  Future<String> uploadXFile(XFile xFile, {String? category, String? folder}) async {
+  Future<String> uploadXFile(XFile xFile, {String? category, String? folder, String? sub, String? orderId}) async {
     final bytes = await xFile.readAsBytes();
-    return uploadImageBytes(bytes, xFile.name, mimeType: xFile.mimeType, category: category, folder: folder);
+    return uploadImageBytes(bytes, xFile.name, mimeType: xFile.mimeType, category: category, folder: folder, sub: sub, orderId: orderId);
   }
 
-  Future<String> uploadImage(String filePath, {String folder = 'uploads', String? category, String? captainId, XFile? xFile}) async {
+  Future<String> uploadImage(String filePath, {String? folder, String? category, String? captainId, String? sub, String? orderId, XFile? xFile}) async {
     if (xFile != null) {
-      return uploadXFile(xFile, category: category, folder: folder);
+      return uploadXFile(xFile, category: category, folder: folder, sub: sub, orderId: orderId);
     }
     if (kIsWeb) {
       throw ApiException('يرجى اختيار صورة صالحة للرفع في المتصفح');
     }
     final file = File(filePath);
     final bytes = await file.readAsBytes();
-    return uploadImageBytes(bytes, filePath, category: category, folder: folder);
+    return uploadImageBytes(bytes, filePath, category: category, folder: folder, sub: sub, orderId: orderId);
   }
 
   static String imageUrl(String url) {

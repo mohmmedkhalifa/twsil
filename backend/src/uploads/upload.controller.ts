@@ -28,7 +28,62 @@ try {
 }
 
 export function baseUrl() {
-  return (process.env.BASE_URL ?? 'http://localhost:4000').replace(/\/$/, '');
+  return (process.env.BASE_URL ?? '').replace(/\/$/, '');
+}
+
+/**
+ * Canonical storage layout inside the `twsil-images` bucket:
+ *
+ * identities/captain-id/<front|back>/...
+ * driving-licenses/...
+ * transfer-receipts/<userId|orderId|anonymous>/
+ * delivery-proofs/<orderId>/
+ * order-images/<orderId>/
+ *
+ * Legacy client folders (`receipts`, `identity`, `licenses`, `uploads`)
+ * are mapped onto this layout so every image lands in the right place
+ * regardless of which app version uploaded it.
+ */
+export function buildStorageKey(
+  rawCategory: string | undefined,
+  rawFolder: string | undefined,
+  sub: string | undefined,
+  orderId: string | undefined,
+  fileName: string,
+): string {
+  const category = String(rawCategory ?? rawFolder ?? '').toLowerCase().trim();
+  const subFolder = String(sub ?? '').toLowerCase().trim();
+
+  switch (category) {
+    case 'identity':
+    case 'identities':
+    case 'captain-id': {
+      const side = ['front', 'back'].includes(subFolder) ? `/${subFolder}` : '';
+      return `identities/captain-id${side}`;
+    }
+    case 'license':
+    case 'licenses':
+    case 'driving-license':
+      return 'driving-licenses';
+    case 'receipt':
+    case 'receipts':
+    case 'transfer-receipt':
+    case 'transfer-receipts':
+      return `transfer-receipts/${sanitizeSegment(orderId) ?? 'misc'}`;
+    case 'delivery-proof':
+      return `delivery-proofs/${sanitizeSegment(orderId) ?? 'misc'}`;
+    case 'order-image':
+      return `order-images/${sanitizeSegment(orderId) ?? 'misc'}`;
+    default:
+      // Avatars and any uncategorised upload.
+      return 'order-images/misc';
+  }
+}
+
+function sanitizeSegment(value: string | undefined): string | null {
+  if (!value) return null;
+  const clean = value.replace(/[^a-zA-Z0-9-_]/g, '');
+  return clean.length > 0 ? clean : null;
 }
 
 @Controller('upload')
@@ -54,21 +109,26 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Body('folder') folder?: string,
     @Body('category') category?: string,
+    @Body('sub') sub?: string,
+    @Body('orderId') orderId?: string,
   ) {
     if (!file) throw new BadRequestException('File is required');
-    const targetFolder = (folder || category || '').toLowerCase();
-    const folderName = targetFolder === 'receipts' ? 'receipts' : 'uploads';
     const key = `${Date.now()}-${uuid()}${extname(file.originalname ?? '')}`;
-    const fileName = `${folderName}/${key}`;
+    const folderName = buildStorageKey(category, folder, sub, orderId, file.originalname ?? '');
+    const objectPath = `${folderName}/${key}`;
 
     if (this.s3.enabled) {
-      const url = await this.s3.put(fileName, file.buffer, file.mimetype);
-      return { url };
+      const url = await this.s3.put(objectPath, file.buffer, file.mimetype);
+      return { url, path: objectPath };
     }
 
-    const dest = join(process.cwd(), UPLOAD_DIR, folderName);
-    fs.mkdirSync(dest, { recursive: true });
-    fs.writeFileSync(join(dest, key), file.buffer);
-    return { url: `${baseUrl()}/${UPLOAD_DIR}/${folderName}/${key}` };
+    const dest = join(process.cwd(), UPLOAD_DIR, objectPath);
+    fs.mkdirSync(dest.substring(0, dest.lastIndexOf('/')), { recursive: true });
+    fs.writeFileSync(dest, file.buffer);
+    const base = baseUrl();
+    return {
+      url: base ? `${base}/${UPLOAD_DIR}/${objectPath}` : objectPath,
+      path: objectPath,
+    };
   }
 }

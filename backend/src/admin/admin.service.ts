@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   CaptainProfile,
   SubscriptionStatus,
@@ -12,6 +12,11 @@ import { OrderPayment } from '../database/entities/order-payment.entity';
 import { Subscription } from '../database/entities/subscription.entity';
 import { Review } from '../database/entities/review.entity';
 import { Complaint } from '../database/entities/complaint.entity';
+import { Conversation } from '../database/entities/conversation.entity';
+import { Message } from '../database/entities/message.entity';
+import { Notification } from '../database/entities/notification.entity';
+import { CaptainOffer } from '../database/entities/captain-offer.entity';
+import { OrderTimeline } from '../database/entities/order-timeline.entity';
 import { PaymentMethod, PaymentStatus } from '../database/entities/subscription.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -38,6 +43,7 @@ export class AdminService {
     @InjectRepository(Complaint)
     private readonly complaintsRepo: Repository<Complaint>,
     private readonly notifications: NotificationsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async stats() {
@@ -189,10 +195,84 @@ export class AdminService {
     return profile;
   }
 
+  /**
+   * Regular users (customers) ONLY. Captains and admins are managed on
+   * their own pages; the separation is enforced here at the API level so
+   * no client-side filtering can mix account types.
+   */
   async listUsers(role?: UserRole) {
-    const qb = this.usersRepo.createQueryBuilder('u').orderBy('u.createdAt', 'DESC');
-    if (role) qb.where('u.role = :role', { role });
+    const qb = this.usersRepo
+      .createQueryBuilder('u')
+      .where('u.role = :role', { role: UserRole.Customer })
+      .orderBy('u.createdAt', 'DESC');
+    if (role && role !== UserRole.Customer) {
+      throw new BadRequestException('The users page serves regular customers only');
+    }
     return qb.getMany();
+  }
+
+  /** Administrative accounts only. */
+  async listAdmins() {
+    return this.usersRepo.find({
+      where: { role: UserRole.Admin },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Permanently deletes a regular user and every record that references
+   * them, inside a single database transaction. Admin accounts can never
+   * be deleted through this endpoint.
+   */
+  async deleteUser(userId: string) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, { where: { id: userId } });
+      if (!user) throw new NotFoundException('User not found');
+      if (user.role === UserRole.Admin) {
+        throw new BadRequestException('Admin accounts cannot be deleted from the users page');
+      }
+
+      // Orders linked to the user (as customer or captain).
+      const orders = await manager.find(Order, {
+        where: [{ customerId: userId }, { captainId: userId }],
+        select: { id: true },
+      });
+      const orderIds = orders.map((o) => o.id);
+
+      // Conversations where the user is a party (their messages cascade).
+      const conversations = await manager.find(Conversation, {
+        where: [{ customerId: userId }, { captainId: userId }],
+        select: { id: true },
+      });
+      const conversationIds = conversations.map((c) => c.id);
+
+      if (conversationIds.length > 0) {
+        await manager.delete(Message, { conversationId: In(conversationIds) });
+        await manager.delete(Conversation, { id: In(conversationIds) });
+      }
+      if (orderIds.length > 0) {
+        await manager.delete(OrderPayment, { orderId: In(orderIds) });
+        await manager.delete(OrderTimeline, { orderId: In(orderIds) });
+        await manager.delete(CaptainOffer, { orderId: In(orderIds) });
+        await manager.delete(Review, { orderId: In(orderIds) });
+        await manager.delete(Order, { id: In(orderIds) });
+      }
+      await manager.delete(CaptainOffer, { captainId: userId });
+      await manager.delete(Review, [
+        { reviewerId: userId },
+        { revieweeId: userId },
+      ]);
+      await manager.delete(Notification, { userId });
+      await manager.delete(Complaint, [
+        { reporterId: userId },
+        { againstUserId: userId },
+      ]);
+      await manager.delete(Subscription, { captainId: userId });
+      await manager.delete(CaptainProfile, { userId });
+      await manager.delete(User, { id: userId });
+
+      return { ok: true, deletedUserId: userId, deletedOrders: orderIds.length };
+    });
   }
 
   async toggleBan(userId: string) {

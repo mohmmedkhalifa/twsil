@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import 'package:go_router/go_router.dart';
 import '../core/polling.dart';
 
 class CaptainsPage extends StatefulWidget {
@@ -335,6 +336,7 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
                                   final phone = (user['phone']?.toString().isNotEmpty == true) ? user['phone'].toString() : '-';
 
                                   return DataRow(
+                                    onSelectChanged: (_) => context.go('/admin/captains/${c['userId']}'),
                                     cells: [
                                       DataCell(
                                         Row(

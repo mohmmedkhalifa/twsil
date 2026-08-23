@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/polling.dart';
@@ -66,63 +67,63 @@ class _StatsPageState extends State<StatsPage> with PollingMixin {
                             color: const Color(0xFF2563EB),
                             label: 'إجمالي المستخدمين',
                             value: '${s['usersCount'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(4),
+                            onTap: () => context.go('/admin/users'),
                           ),
                           _StatCard(
                             icon: Icons.verified_user,
                             color: const Color(0xFF7C3AED),
                             label: 'السائقون',
                             value: '${s['captainsCount'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(3),
+                            onTap: () => context.go('/admin/captains'),
                           ),
                           _StatCard(
                             icon: Icons.person_outline,
                             color: const Color(0xFF0EA5E9),
                             label: 'العملاء',
                             value: '${s['customersCount'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(4),
+                            onTap: () => context.go('/admin/users'),
                           ),
                           _StatCard(
                             icon: Icons.delivery_dining,
                             color: ATheme.primary,
                             label: 'طلبات نشطة',
                             value: '${s['activeOrdersCount'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(2),
+                            onTap: () => context.go('/admin/orders'),
                           ),
                           _StatCard(
                             icon: Icons.pending_actions,
                             color: const Color(0xFFF59E0B),
                             label: 'توثيق بانتظار',
                             value: '${s['pendingVerification'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(3),
+                            onTap: () => context.go('/admin/captains'),
                           ),
                           _StatCard(
                             icon: Icons.fact_check_outlined,
                             color: const Color(0xFFF97316),
                             label: 'اشتراكات للمراجعة',
                             value: '${s['pendingSubscriptions'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(3),
+                            onTap: () => context.go('/admin/captains'),
                           ),
                           _StatCard(
                             icon: Icons.receipt_long,
                             color: const Color(0xFFEF4444),
                             label: 'إيصالات للمراجعة',
                             value: '${s['pendingPayments'] ?? 0}',
-                            onTap: () => widget.onSelectTab?.call(1),
+                            onTap: () => context.go('/admin/payments'),
                           ),
                           _StatCard(
                             icon: Icons.payments,
                             color: const Color(0xFF10B981),
                             label: 'إيرادات الاشتراكات',
                             value: '${s['subscriptionRevenue'] ?? 0} ₪',
-                            onTap: () => widget.onSelectTab?.call(1),
+                            onTap: () => context.go('/admin/payments'),
                           ),
                           _StatCard(
                             icon: Icons.savings_outlined,
                             color: const Color(0xFF6366F1),
                             label: 'إيرادات رسوم الخدمة',
                             value: '${s['serviceFeeRevenue'] ?? 0} ₪',
-                            onTap: () => widget.onSelectTab?.call(1),
+                            onTap: () => context.go('/admin/payments'),
                           ),
                         ],
                       ),
