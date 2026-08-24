@@ -1,7 +1,6 @@
 {
   "hosting": [
     {
-      "site": "twsil-app",
       "public": "mobile/build/web",
       "ignore": [
         "firebase.json",
@@ -37,7 +36,6 @@
       "target": "app"
     },
     {
-      "site": "twsil-db653",
       "public": "admin/build/web",
       "ignore": [
         "firebase.json",
