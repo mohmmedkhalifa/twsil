@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/network/api_client.dart';
+import '../../core/version.dart';
 import '../../core/widgets/ui_components.dart';
 import '../auth/auth_cubit.dart';
 import '../auth/auth_screens.dart';
@@ -201,12 +202,19 @@ class ProfileScreen extends StatelessWidget {
                       },
                     ),
                   ],
+                 ),
+               ),
+              const SizedBox(height: AppSpacing.lg),
+              Center(
+                child: Text(
+                  'رقم الإصدار: $appVersion',
+                  style: AppTypography.caption.copyWith(color: AppColors.textMuted),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+             ],
+           ),
+         );
+       },
+     );
+   }
 }
