@@ -168,7 +168,7 @@ class _CaptainDetailScreenState extends State<CaptainDetailScreen> {
                         const Divider(height: 26),
                         InfoRow(label: 'رقم الهاتف', value: _captain!['user']['phone']?.toString() ?? '-'),
                         InfoRow(label: 'البريد الإلكتروني', value: _captain!['user']['email']?.toString() ?? '-'),
-                        InfoRow(label: 'نوع المركبة', value: _captain!['transportType']?.toString() ?? '-'),
+                        InfoRow(label: 'نوع المركبة', value: transportTypeLabel(_captain!['transportType']?.toString() ?? '')),
                         InfoRow(label: 'رقم اللوحة', value: _captain!['plateNumber']?.toString() ?? '-'),
                         InfoRow(label: 'رقم الهوية', value: _captain!['nationalId']?.toString() ?? '-'),
                         InfoRow(label: 'المدينة', value: _captain!['city']?.toString() ?? '-'),

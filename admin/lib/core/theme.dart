@@ -96,11 +96,13 @@ String statusLabel(String status) {
     case 'awaiting_payment':
       return 'بانتظار الدفع';
     case 'payment_submitted':
-      return 'تم الإرسال';
+      return 'تم إرسال الإيصال';
     case 'active':
       return 'فعّال';
     case 'inactive':
       return 'غير فعّال';
+    case 'submitted':
+      return 'تم الإرسال';
     case 'pending':
       return 'قيد المراجعة';
     case 'remitted':
@@ -120,23 +122,73 @@ String statusLabel(String status) {
     case 'reassign':
       return 'إعادة';
     case 'awaiting_captain':
-      return 'بانتظار سائق';
+      return 'بانتظار الكابتن';
     case 'captain_assigned':
-      return 'سائق معيّن';
+      return 'تم تعيين الكابتن';
     case 'en_route_pickup':
       return 'في الطريق للاستلام';
     case 'arrived_pickup':
-      return 'وصل للاستلام';
+      return 'وصل نقطة الاستلام';
     case 'picked_up':
-      return 'تم الاستلام';
+      return 'تم استلام الطرد';
     case 'en_route_delivery':
       return 'في الطريق للتسليم';
     case 'arrived_dropoff':
-      return 'وصل للتسليم';
+      return 'وصل موقع التسليم';
     case 'payment_pending':
       return 'بانتظار الدفع';
+    case 'verification_approved':
+      return 'موثّق ومقبول';
+    case 'verification_pending':
+      return 'قيد المراجعة';
+    case 'verification_rejected':
+      return 'مرفوض';
     default:
-      return status;
+      // Never expose raw snake_case / enum values to users.
+      final cleaned = status.trim();
+      return cleaned.isEmpty ? '-' : cleaned.replaceAll('_', ' ');
+  }
+}
+
+/// Payment methods as readable Arabic names (values stay untouched).
+String paymentMethodLabel(String method) {
+  switch (method) {
+    case 'jawwal_pay':
+      return 'جوّال باي';
+    case 'bop_palestine':
+      return 'بنك فلسطين';
+    case 'palpay':
+      return 'بال باي';
+    default:
+      return method.isEmpty ? '-' : method;
+  }
+}
+
+/// Captain transport types as readable Arabic names.
+String transportTypeLabel(String type) {
+  switch (type) {
+    case 'car':
+      return 'سيارة';
+    case 'motorcycle':
+      return 'دراجة نارية';
+    case 'bicycle':
+      return 'دراجة هوائية';
+    case 'other':
+      return 'أخرى';
+    default:
+      return type.isEmpty ? '-' : type;
+  }
+}
+
+/// Locale codes as readable language names.
+String localeLabel(String locale) {
+  switch (locale) {
+    case 'ar':
+      return 'العربية';
+    case 'en':
+      return 'English';
+    default:
+      return locale.isEmpty ? '-' : locale;
   }
 }
 void snack(BuildContext context, String msg, {bool error = false}) {

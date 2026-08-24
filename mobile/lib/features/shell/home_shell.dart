@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../auth/auth_cubit.dart';
 import '../auth/auth_screens.dart';
+import '../captain/available_orders_screen.dart';
 import '../captain/captain_dashboard_screen.dart';
 import '../customer/customer_home_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -39,6 +40,7 @@ class _ShellBodyState extends State<_ShellBody> {
     final pages = isCaptain
         ? const [
             CaptainDashboardScreen(),
+            AvailableOrdersScreen(),
             CustomerHomeScreen(captainMode: true),
             NotificationsScreen(),
             ProfileScreen(),

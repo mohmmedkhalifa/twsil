@@ -86,8 +86,12 @@ export class AdminService {
       }),
       this.ordersRepo.count(),
       this.captainsRepo.count({ where: { verificationStatus: VerificationStatus.Pending } }),
-      this.subsRepo.count({ where: { status: PaymentStatus.UnderReview } }),
-      this.paymentsRepo.count({ where: { status: PaymentStatus.UnderReview } }),
+      this.subsRepo.count({
+        where: { status: In([PaymentStatus.UnderReview, PaymentStatus.PaymentSubmitted]) },
+      }),
+      this.paymentsRepo.count({
+        where: { status: In([PaymentStatus.UnderReview, PaymentStatus.PaymentSubmitted]) },
+      }),
       this.subsRepo
         .createQueryBuilder('s')
         .select('COALESCE(SUM(s.amount),0)', 'sum')

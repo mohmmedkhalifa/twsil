@@ -25,15 +25,17 @@ import { RealtimeGateway } from '../realtime/realtime.gateway';
 import { haversineKm } from '../common/utils/haversine';
 
 export class CreateOrderDto {
-  pickupLat: number;
-  pickupLng: number;
+  pickupLat?: number;
+  pickupLng?: number;
   pickupAddress: string;
-  dropoffLat: number;
-  dropoffLng: number;
+  dropoffLat?: number;
+  dropoffLng?: number;
   dropoffAddress: string;
   packageDescription: string;
   packageSize?: PackageSize;
   weightKg?: number;
+  /** Client idempotency token: retries with the same token never duplicate. */
+  clientRequestId?: string;
 }
 
 export class SubmitOrderPaymentDto {
@@ -84,30 +86,37 @@ export class OrdersService {
   ) {}
 
   async create(customerId: string, dto: CreateOrderDto) {
-    this.assertLatLng(dto.pickupLat, dto.pickupLng, 'pickup');
-    this.assertLatLng(dto.dropoffLat, dto.dropoffLng, 'dropoff');
     if (!dto.pickupAddress || !dto.dropoffAddress || !dto.packageDescription) {
       throw new BadRequestException('Pickup address, dropoff address and package description are required');
     }
 
-    const distanceKm = Math.round(
-      haversineKm(
-        dto.pickupLat,
-        dto.pickupLng,
-        dto.dropoffLat,
-        dto.dropoffLng,
-      ) * 1000
-    ) / 1000;
+    // Coordinates are optional (manual addresses) but must be complete and
+    // valid when provided. Never store fake placeholders like 0,0.
+    const pickup = this.optionalLatLng(dto.pickupLat, dto.pickupLng, 'pickup');
+    const dropoff = this.optionalLatLng(dto.dropoffLat, dto.dropoffLng, 'dropoff');
+
+    // ---- Idempotency: replaying the same client token returns the SAME order.
+    if (dto.clientRequestId) {
+      const existing = await this.ordersRepo.findOne({
+        where: { customerId, clientRequestId: dto.clientRequestId },
+      });
+      if (existing) return this.detail(existing.id, customerId);
+    }
+
+    const distanceKm =
+      pickup && dropoff
+        ? Math.round(haversineKm(pickup.lat, pickup.lng, dropoff.lat, dropoff.lng) * 1000) / 1000
+        : 0;
     const deliveryFee = 0;
 
     const order = this.ordersRepo.create({
       orderNumber: this.generateOrderNumber(),
       customerId,
-      pickupLat: dto.pickupLat,
-      pickupLng: dto.pickupLng,
+      pickupLat: pickup?.lat ?? null,
+      pickupLng: pickup?.lng ?? null,
       pickupAddress: dto.pickupAddress,
-      dropoffLat: dto.dropoffLat,
-      dropoffLng: dto.dropoffLng,
+      dropoffLat: dropoff?.lat ?? null,
+      dropoffLng: dropoff?.lng ?? null,
       dropoffAddress: dto.dropoffAddress,
       packageDescription: dto.packageDescription,
       packageSize: dto.packageSize ?? PackageSize.Medium,
@@ -117,18 +126,31 @@ export class OrdersService {
       serviceFee: SERVICE_FEE,
       status: OrderStatus.PaymentPending,
       pickupCode: String(Math.floor(1000 + Math.random() * 9000)),
+      clientRequestId: dto.clientRequestId ?? null,
     });
-    const saved = await this.ordersRepo.save(order);
 
-    await this.addTimeline(saved.id, customerId, 'order:created', 'تم إنشاء الطلب بانتظار الدفع');
-    await this.notifications.push(
-      [customerId],
-      'order:created',
-      'تم إنشاء الطلب',
-      `الرجاء دفع رسوم الخدمة (${SERVICE_FEE} شيكل) وتأكيد الدفع لإتمام الطلب ${saved.orderNumber}.`,
-      { orderId: saved.id },
-    );
-    return this.detail(saved.id, customerId);
+    try {
+      const saved = await this.ordersRepo.save(order);
+      await this.addTimeline(saved.id, customerId, 'order:created', 'تم إنشاء الطلب بانتظار الدفع');
+      await this.notifications.push(
+        [customerId],
+        'order:created',
+        'تم إنشاء الطلب',
+        `الرجاء دفع رسوم الخدمة (${SERVICE_FEE} شيكل) وتأكيد الدفع لإتمام الطلب ${saved.orderNumber}.`,
+        { orderId: saved.id },
+      );
+      return this.detail(saved.id, customerId);
+    } catch (e: any) {
+      // Lost race between two concurrent submissions of the same token:
+      // return the winner instead of failing with a DB error.
+      if (e?.code === '23505' && dto.clientRequestId) {
+        const existing = await this.ordersRepo.findOne({
+          where: { customerId, clientRequestId: dto.clientRequestId },
+        });
+        if (existing) return this.detail(existing.id, customerId);
+      }
+      throw e;
+    }
   }
 
   async submitPayment(customerId: string, orderId: string, dto: SubmitOrderPaymentDto) {
@@ -142,6 +164,11 @@ export class OrdersService {
     }
     if (!dto.receiptImageUrl || !dto.paymentMethod) {
       throw new BadRequestException('Receipt image and payment method are required');
+    }
+    if (!Object.values(PaymentMethod).includes(dto.paymentMethod)) {
+      throw new BadRequestException(
+        `Invalid payment method "${dto.paymentMethod}". Allowed: ${Object.values(PaymentMethod).join(', ')}`,
+      );
     }
 
     const existing = await this.paymentsRepo.findOne({
@@ -188,6 +215,16 @@ export class OrdersService {
     });
     if (!payment) throw new NotFoundException('Payment not found');
 
+    // A receipt can only be reviewed while it is actually pending review.
+    if (![PaymentStatus.UnderReview, PaymentStatus.PaymentSubmitted].includes(payment.status)) {
+      throw new BadRequestException(
+        `This receipt is "${payment.status}" and can no longer be reviewed. Refresh the list.`,
+      );
+    }
+    if (!dto.action || !['approve', 'reject', 'request_receipt'].includes(dto.action)) {
+      throw new BadRequestException('Invalid review action');
+    }
+
     const reviewed: Partial<OrderPayment> = {
       adminNote: dto.note ?? null,
       reviewedById: adminId,
@@ -195,7 +232,7 @@ export class OrdersService {
     };
 
     switch (dto.action) {
-      case 'approve':
+      case 'approve': {
         payment.status = PaymentStatus.Approved;
         Object.assign(payment, reviewed);
         await this.paymentsRepo.save(payment);
@@ -205,56 +242,74 @@ export class OrdersService {
         }
         await this.addTimeline(payment.orderId, adminId, 'payment:approved', 'تم الموافقة على الدفع');
         await this.notifications.push(
-          [payment.order.customerId],
+          [payment.order?.customerId].filter((x): x is string => Boolean(x)),
           'order:payment_approved',
           'تم تأكيد الدفع ✅',
           'تمت الموافقة على الدفع، طلبك أصبح متاحاً للسائقين الآن.',
           { orderId: payment.orderId },
         );
         break;
-      case 'reject':
+      }
+      case 'reject': {
         payment.status = PaymentStatus.Rejected;
         Object.assign(payment, reviewed);
         await this.paymentsRepo.save(payment);
         await this.addTimeline(payment.orderId, adminId, 'payment:rejected', dto.note ?? '');
         await this.notifications.push(
-          [payment.order.customerId],
+          [payment.order?.customerId].filter((x): x is string => Boolean(x)),
           'order:payment_rejected',
           'تم رفض الدفع',
           dto.note ?? 'لم يتم التحقق من إيصال الدفع.',
           { orderId: payment.orderId },
         );
         break;
-      case 'request_receipt':
+      }
+      case 'request_receipt': {
         payment.status = PaymentStatus.AwaitingPayment;
         Object.assign(payment, reviewed);
         await this.paymentsRepo.save(payment);
         await this.notifications.push(
-          [payment.order.customerId],
+          [payment.order?.customerId].filter((x): x is string => Boolean(x)),
           'order:receipt_required',
           'يُطلب إيصال جديد',
           dto.note ?? 'يرجى رفع إيصال دفع جديد وواضح.',
           { orderId: payment.orderId },
         );
         break;
+      }
       default:
         throw new BadRequestException('Invalid review action');
     }
     return payment;
   }
 
+  /**
+   * Open delivery requests for captains. The backend enforces WHO may see
+   * them: the captain must exist, not be banned, be verified & approved,
+   * be activated by admin AND hold an active subscription. Customer
+   * identity/contact details are intentionally NOT included before an
+   * order is assigned.
+   */
   async availableOrders(captainId: string) {
+    const user = await this.usersRepo.findOne({
+      where: { id: captainId },
+      select: { id: true, isBanned: true },
+    });
     const profile = await this.captainsRepo.findOne({ where: { userId: captainId } });
-    const isApproved = profile && (
-      profile.verificationStatus === VerificationStatus.Approved ||
-      (profile.verificationStatus as string) === 'verification_approved'
-    );
-    if (!profile || !isApproved || profile.isActive === false) {
-      throw new ForbiddenException('حسابك غير مفعل أو بانتظار توثيق الإدارة');
+    const eligible =
+      !!user &&
+      !user.isBanned &&
+      !!profile &&
+      profile.verificationStatus === VerificationStatus.Approved &&
+      profile.isActive === true &&
+      profile.subscriptionStatus === SubscriptionStatus.Active;
+    if (!user || !profile || user.isBanned || !eligible) {
+      throw new ForbiddenException(
+        'لا يمكنك استقبال الطلبات الآن: تأكد من توثيق حسابك وتفعيله من الإدارة واشتراك ساري المفعول',
+      );
     }
     return this.ordersRepo.find({
       where: { status: OrderStatus.AwaitingCaptain },
-      relations: { customer: true, payments: true },
       order: { createdAt: 'ASC' },
       take: 50,
     });
@@ -579,6 +634,19 @@ export class OrdersService {
     if (typeof lat !== 'number' || typeof lng !== 'number' || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       throw new BadRequestException(`Valid ${field} coordinates are required`);
     }
+  }
+
+  /**
+   * Coordinates are optional (manual address entry). When provided they
+   * must come as a complete, valid pair; otherwise null is stored.
+   */
+  private optionalLatLng(lat?: number, lng?: number, field = ''): { lat: number; lng: number } | null {
+    if (lat == null && lng == null) return null;
+    if (typeof lat !== 'number' || typeof lng !== 'number') {
+      throw new BadRequestException(`${field} location requires both latitude and longitude`);
+    }
+    this.assertLatLng(lat, lng, field);
+    return { lat, lng };
   }
 
   private roundFee(value: number): number {

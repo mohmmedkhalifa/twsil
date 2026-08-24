@@ -294,18 +294,7 @@ class _OrdersPageState extends State<OrdersPage> with PollingMixin {
     );
   }
 
-  String _methodLabel(String m) {
-    switch (m) {
-      case 'jawwal_pay':
-        return 'جوال باي (Jawwal Pay)';
-      case 'bop_palestine':
-        return 'بنك فلسطين (BOP)';
-      case 'palpay':
-        return 'بال باي (PalPay)';
-      default:
-        return m;
-    }
-  }
+  String _methodLabel(String m) => paymentMethodLabel(m);
 
   Widget _buildPaymentStatusChip(String st) {
     Color col;

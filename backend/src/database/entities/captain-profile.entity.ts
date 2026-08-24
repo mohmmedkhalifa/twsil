@@ -91,7 +91,7 @@ export class CaptainProfile {
   @Column({ type: 'float', default: 0 })
   totalEarnings: number;
 
-  @Column({ default: true })
+  @Column({ default: false })
   isActive: boolean;
 
   @Column({ type: 'text', nullable: true })

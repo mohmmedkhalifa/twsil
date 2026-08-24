@@ -139,7 +139,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     InfoRow(label: 'البريد الإلكتروني', value: _user!['email']?.toString() ?? '-'),
                     InfoRow(label: 'تاريخ التسجيل', value: _formatDate(_user!['createdAt'])),
                     InfoRow(label: 'آخر تحديث', value: _formatDate(_user!['updatedAt'])),
-                    InfoRow(label: 'اللغة', value: _user!['locale']?.toString() ?? 'ar'),
+                    InfoRow(label: 'اللغة', value: localeLabel(_user!['locale']?.toString() ?? '')),
                   ]),
                   Row(
                     children: [

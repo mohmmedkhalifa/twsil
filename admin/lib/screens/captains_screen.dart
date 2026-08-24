@@ -164,7 +164,7 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _infoItem('نوع المركبة', captain['transportType'] ?? 'سيارة'),
+                      _infoItem('نوع المركبة', transportTypeLabel(captain['transportType']?.toString() ?? '')),
                       _infoItem('رقم اللوحة', captain['plateNumber'] ?? '-'),
                       _infoItem('رقم الهوية', captain['nationalId'] ?? '-'),
                     ],
@@ -358,7 +358,7 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
                                         ),
                                       ),
                                       DataCell(Text(phone, style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold))),
-                                      DataCell(Text(c['transportType'] ?? 'سيارة', style: const TextStyle(fontSize: 13))),
+                                      DataCell(Text(transportTypeLabel(c['transportType']?.toString() ?? ''), style: const TextStyle(fontSize: 13))),
                                       DataCell(
                                         OutlinedButton.icon(
                                           style: OutlinedButton.styleFrom(

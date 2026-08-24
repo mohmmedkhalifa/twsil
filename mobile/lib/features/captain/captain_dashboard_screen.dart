@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/models.dart';
 import '../../core/network/api_client.dart';
+import '../../core/status_labels.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_components.dart';
 import '../auth/auth_cubit.dart';
@@ -207,7 +208,7 @@ class _CaptainDashboardScreenState extends State<CaptainDashboardScreen> {
                     ListTile(
                       leading: const Icon(Icons.verified_user_outlined, color: AppColors.primary),
                       title: const Text('توثيق الهوية والوثائق'),
-                      subtitle: Text('الحالة: ${profile.verificationStatus}'),
+                      subtitle: Text('الحالة: ${verificationStatusLabel(profile.verificationStatus)}'),
                       trailing: StatusChip.fromStatus(profile.verificationStatus),
                       onTap: () {
                         Navigator.of(context).push(
@@ -220,7 +221,7 @@ class _CaptainDashboardScreenState extends State<CaptainDashboardScreen> {
                     ListTile(
                       leading: const Icon(Icons.card_membership_outlined, color: AppColors.primary),
                       title: const Text('اشتراك الكابتن الشهري'),
-                      subtitle: Text('الحالة: ${profile.subscriptionStatus}'),
+                      subtitle: Text('الحالة: ${profileStatusLabel(profile.subscriptionStatus)}'),
                       trailing: StatusChip.fromStatus(profile.subscriptionStatus),
                       onTap: () {
                         Navigator.of(context).push(
@@ -277,7 +278,7 @@ class _CaptainInfoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'وسيلة النقل: ${profile.transportType == "motorcycle" ? "دراجة نارية 🏍️" : "سيارة 🚗"}',
+                  'وسيلة النقل: ${transportTypeLabel(profile.transportType)}',
                   style: AppTypography.caption,
                 ),
               ],

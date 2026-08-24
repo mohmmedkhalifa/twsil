@@ -207,7 +207,8 @@ class _PaySubscriptionScreenState extends State<_PaySubscriptionScreen> {
           SegmentedButton<String>(
             segments: const [
               ButtonSegment(value: 'jawwal_pay', label: Text('جوّال باي')),
-              ButtonSegment(value: 'bank_palestine', label: Text('بنك فلسطين')),
+              ButtonSegment(value: 'bop_palestine', label: Text('بنك فلسطين')),
+              ButtonSegment(value: 'palpay', label: Text('PalPay')),
             ],
             selected: {_method},
             onSelectionChanged: (s) => setState(() => _method = s.first),

@@ -126,9 +126,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('طريقة الدفع: ${p['paymentMethod'] ?? '-'}',
+                      Text('طريقة الدفع: ${paymentMethodLabel(p['paymentMethod']?.toString() ?? '')}',
                           style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)),
-                      Text('المبلغ: ${p['amount'] ?? '-'} ₪ • الحالة: ${p['status'] ?? '-'}',
+                      Text('المبلغ: ${p['amount'] ?? '-'} ₪ • الحالة: ${statusLabel(p['status']?.toString() ?? '')}',
                           style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
                     ],
                   ),

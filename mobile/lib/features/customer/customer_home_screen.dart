@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/socket_service.dart';
+import '../../core/status_labels.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_components.dart';
 import '../auth/auth_cubit.dart';
@@ -223,7 +224,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
-                                '🚗 ${profile.transportType} | ⭐ ${profile.rating.toStringAsFixed(1)}',
+                                '🚗 ${transportTypeLabel(profile.transportType)} | ⭐ ${profile.rating.toStringAsFixed(1)}',
                                 style: AppTypography.caption,
                               ),
                             ],

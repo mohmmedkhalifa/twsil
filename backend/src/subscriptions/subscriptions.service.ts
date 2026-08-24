@@ -44,6 +44,11 @@ export class SubscriptionsService {
     if (!profile) throw new NotFoundException('Captain profile not found');
     if (!dto.receiptImageUrl) throw new BadRequestException('Payment receipt image is required');
     if (!dto.paymentMethod) throw new BadRequestException('Payment method is required');
+    if (!Object.values(PaymentMethod).includes(dto.paymentMethod)) {
+      throw new BadRequestException(
+        `Invalid payment method "${dto.paymentMethod}". Allowed: ${Object.values(PaymentMethod).join(', ')}`,
+      );
+    }
 
     let sub = await this.subsRepo.findOne({
       where: { captainId, status: PaymentStatus.Rejected },
@@ -61,7 +66,7 @@ export class SubscriptionsService {
     } else {
       sub.amount = SUBSCRIPTION_FEE;
       sub.adminNote = null;
-      sub.reviewedBy = null;
+      sub.reviewedById = null;
       sub.reviewedAt = null;
     }
 
@@ -97,6 +102,17 @@ export class SubscriptionsService {
       relations: { captain: true, reviewedBy: true },
     });
     if (!sub) throw new NotFoundException('Subscription not found');
+
+    // A receipt can only be reviewed while it is actually pending review.
+    if (![PaymentStatus.UnderReview, PaymentStatus.PaymentSubmitted].includes(sub.status)) {
+      throw new BadRequestException(
+        `This subscription receipt is "${sub.status}" and can no longer be reviewed. Refresh the list.`,
+      );
+    }
+    if (!dto.action || !['approve', 'reject', 'request_receipt'].includes(dto.action)) {
+      throw new BadRequestException('Invalid review action');
+    }
+
     const profile = await this.captainsRepo.findOne({ where: { userId: sub.captainId } });
 
     const reviewed = {

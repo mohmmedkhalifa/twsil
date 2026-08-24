@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/polling.dart';
+import '../core/version.dart';
 
 class StatsPage extends StatefulWidget {
   final Function(int index)? onSelectTab;
@@ -126,6 +127,34 @@ class _StatsPageState extends State<StatsPage> with PollingMixin {
                             onTap: () => context.go('/admin/payments'),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                'رقم الإصدار: $appVersion',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1F2937),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'بناء: $buildStamp',
+                                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),

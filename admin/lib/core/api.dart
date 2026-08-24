@@ -130,10 +130,10 @@ class AApi {
         return _httpGet('/admin/stats', query: query);
 
       case '/orders/admin/payments':
-        return _payments();
+        return _payments(query?['status']);
 
       case '/admin/subscriptions':
-        return _subscriptions();
+        return _subscriptions(query?['status']);
 
       case '/admin/captains':
         return _captains();
@@ -289,8 +289,10 @@ class AApi {
 
   // ------------------------------------------------------------- queries (NestJS → screen shapes)
 
-  Future<List<dynamic>> _payments() async {
-    final res = await _httpGet('/admin/payments');
+  Future<List<dynamic>> _payments([String? status]) async {
+    final res = await _httpGet('/orders/admin/payments', query: {
+      if (status != null && status.isNotEmpty) 'status': status,
+    });
     if (res is! List) return [];
     return res.map((e) {
       final m = (e as Map).map((k, v) => MapEntry(k.toString(), v));
@@ -313,8 +315,10 @@ class AApi {
     }).toList();
   }
 
-  Future<List<dynamic>> _subscriptions() async {
-    final res = await _httpGet('/admin/subscriptions');
+  Future<List<dynamic>> _subscriptions([String? status]) async {
+    final res = await _httpGet('/admin/subscriptions', query: {
+      if (status != null && status.isNotEmpty) 'status': status,
+    });
     if (res is! List) return [];
     return res.map((e) {
       final m = (e as Map).map((k, v) => MapEntry(k.toString(), v));

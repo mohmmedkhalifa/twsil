@@ -32,14 +32,13 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
       final p = await AApi.instance.get('/orders/admin/payments', query: {
         if (_filter != 'all') 'status': _filter,
       }) as List;
-      final s = await AApi.instance.get('/admin/subscriptions') as List;
+      final s = await AApi.instance.get('/admin/subscriptions', query: {
+        if (_filter != 'all') 'status': _filter,
+      }) as List;
       if (!mounted) return;
       setState(() {
         _payments = p.cast<Map<String, dynamic>>();
-        _subscriptions = s
-            .cast<Map<String, dynamic>>()
-            .where((e) => _filter == 'all' || (e['status']?.toString() ?? '') == _filter)
-            .toList();
+        _subscriptions = s.cast<Map<String, dynamic>>();
         _loading = false;
       });
     } catch (_) {
@@ -48,13 +47,29 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
     }
   }
 
+  /// A receipt is actionable while it waits for a decision. The backend
+  /// writes 'under_review' for new submissions; older rows may still use
+  /// the legacy 'payment_submitted' value.
+  static bool _isPendingReceipt(String? status) =>
+      status == 'under_review' || status == 'payment_submitted';
+
   Future<void> _reviewPayment(String id, String action, String note) async {
     try {
       await AApi.instance.post('/orders/admin/payments/$id/review', body: {
         'action': action,
         if (note.isNotEmpty) 'note': note,
       });
-      if (mounted) _load();
+      if (mounted) {
+        snack(
+          context,
+          action == 'approve'
+              ? 'تم اعتماد الإيصال بنجاح'
+              : action == 'reject'
+                  ? 'تم رفض الإيصال'
+                  : 'تم إرسال طلب إيصال جديد للعميل',
+        );
+        _load();
+      }
     } catch (e) {
       if (mounted) snack(context, ae(e), error: true);
     }
@@ -66,7 +81,10 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
         'action': action,
         if (note != null) 'note': note,
       });
-      if (mounted) _load();
+      if (mounted) {
+        snack(context, action == 'approve' ? 'تم تفعيل الاشتراك بنجاح' : 'تم رفض الاشتراك');
+        _load();
+      }
     } catch (e) {
       if (mounted) snack(context, ae(e), error: true);
     }
@@ -97,10 +115,10 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
                 },
                 items: const [
                   DropdownMenuItem(value: 'all', child: Text('الكل')),
-                  DropdownMenuItem(value: 'payment_submitted', child: Text('في انتظار المراجعة')),
+                  DropdownMenuItem(value: 'under_review', child: Text('بانتظار المراجعة')),
                   DropdownMenuItem(value: 'approved', child: Text('مقبول')),
                   DropdownMenuItem(value: 'rejected', child: Text('مرفوض')),
-                  DropdownMenuItem(value: 'under_review', child: Text('اشتراكات قيد المراجعة')),
+                  DropdownMenuItem(value: 'awaiting_payment', child: Text('بانتظار إيصال جديد')),
                 ],
               ),
             ),
@@ -153,7 +171,7 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
                     style: const TextStyle(fontWeight: FontWeight.w700)),
                 Text('العميل: ${customer['firstName'] ?? ''} ${customer['lastName'] ?? ''} (${customer['phone'] ?? ''})',
                     style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
-                Text('${p['method'] ?? ''} | مرسل: ${p['submittedAt'] ?? ''}',
+                Text('${paymentMethodLabel(p['method']?.toString() ?? '')} | مرسل: ${p['submittedAt'] ?? ''}',
                     style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
                 if (p['note'] != null && p['note'].toString().isNotEmpty)
                   Padding(
@@ -182,7 +200,7 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
                     ),
                   ),
                 ],
-                if (p['status'] == 'payment_submitted') ...[
+                if (_isPendingReceipt(p['status']?.toString())) ...[
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -289,7 +307,7 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
                   '${user['firstName'] ?? ''} ${user['lastName'] ?? ''} (${user['phone'] ?? ''})',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
-                Text('${(s['duration'] ?? 'monthly').toString()} | بداية: ${s['startDate'] ?? ''}',
+                Text('اشتراك شهري | بداية: ${s['startDate'] ?? ''}',
                     style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
                 if (s['note'] != null && s['note'].toString().isNotEmpty)
                   Text('ملاحظة: ${s['note']}', style: const TextStyle(fontSize: 12.5, color: Colors.brown)),
@@ -314,7 +332,7 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
                     ),
                   ),
                 ],
-                if (s['status'] == 'under_review') ...[
+                if (_isPendingReceipt(s['status']?.toString())) ...[
                   const SizedBox(height: 12),
                   Row(
                     children: [

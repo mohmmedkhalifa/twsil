@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../status_labels.dart';
 import '../theme/app_theme.dart';
 
 /// Primary action button
@@ -153,39 +154,12 @@ class StatusChip extends StatelessWidget {
   });
 
   factory StatusChip.fromStatus(String status) {
-    switch (status) {
-      case 'approved':
-      case 'active':
-      case 'delivered':
-      case 'verification_approved':
-        return const StatusChip(
-          label: 'مكتمل / مفعل',
-          color: AppColors.success,
-          backgroundColor: AppColors.successBg,
-        );
-      case 'pending':
-      case 'payment_pending':
-      case 'awaiting_captain':
-      case 'under_review':
-        return const StatusChip(
-          label: 'قيد الانتظار',
-          color: AppColors.warning,
-          backgroundColor: AppColors.warningBg,
-        );
-      case 'rejected':
-      case 'cancelled':
-        return const StatusChip(
-          label: 'ملغي / مرفوض',
-          color: AppColors.danger,
-          backgroundColor: AppColors.dangerBg,
-        );
-      default:
-        return const StatusChip(
-          label: 'غير نشط',
-          color: AppColors.greyStatus,
-          backgroundColor: AppColors.greyStatusBg,
-        );
-    }
+    final color = statusColorFor(status);
+    return StatusChip(
+      label: statusLabel(status),
+      color: color,
+      backgroundColor: color.withValues(alpha: .12),
+    );
   }
 
   @override

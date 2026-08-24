@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'status_labels.dart';
+
 class User {
   final String id;
   final String firstName;
@@ -292,37 +294,9 @@ class Order {
 
   String get formattedDistance => Order.formatDistance(calculatedDistanceKm);
 
-  String get statusLabel {
-    switch (status) {
-      case 'payment_pending':
-        return 'بانتظار دفع الرسوم';
-      case 'awaiting_captain':
-        return 'بانتظار قبول السائق';
-      case 'accepted':
-        return 'تم قبول الطلب من الكابتن';
-      case 'in_transit':
-        return 'جاري التوصيل';
-      case 'delivered':
-        return 'تم التوصيل بنجاح';
-      case 'cancelled':
-        return 'تم إلغاء الطلب';
-      default:
-        return status;
-    }
-  }
+  String get statusLabel => orderStatusLabel(status);
 
-  String get packageSizeText {
-    switch (packageSize) {
-      case 'small':
-        return 'صغير (مغلف/أوراق)';
-      case 'medium':
-        return 'متوسط (حقيبة/صندوق)';
-      case 'large':
-        return 'كبير (أثاث/كرتونة)';
-      default:
-        return packageSize;
-    }
-  }
+  String get packageSizeText => packageSizeLabel(packageSize);
 
   double get weightKg => 1.0;
 

@@ -58,23 +58,31 @@ export class Order {
   @JoinColumn({ name: 'captainId' })
   captain: User | null;
 
-  @Column('float')
-  pickupLat: number;
+  @Column({ type: 'float', nullable: true })
+  pickupLat: number | null;
 
-  @Column('float')
-  pickupLng: number;
+  @Column({ type: 'float', nullable: true })
+  pickupLng: number | null;
 
   @Column()
   pickupAddress: string;
 
-  @Column('float')
-  dropoffLat: number;
+  @Column({ type: 'float', nullable: true })
+  dropoffLat: number | null;
 
-  @Column('float')
-  dropoffLng: number;
+  @Column({ type: 'float', nullable: true })
+  dropoffLng: number | null;
 
   @Column()
   dropoffAddress: string;
+
+  /**
+   * Client-generated idempotency token. One user action must map to
+   * exactly one order even across retries/timeouts; unique index on the
+   * column makes accidental replays impossible at the database level.
+   */
+  @Column({ type: 'text', nullable: true })
+  clientRequestId: string | null;
 
   @Column({ type: 'text' })
   packageDescription: string;

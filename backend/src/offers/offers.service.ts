@@ -4,7 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { CaptainOffer, OfferStatus } from '../database/entities/captain-offer.entity';
 import { Order, OrderStatus } from '../database/entities/order.entity';
 import { Conversation } from '../database/entities/conversation.entity';
-import { CaptainProfile, VerificationStatus } from '../database/entities/captain-profile.entity';
+import { CaptainProfile, SubscriptionStatus, VerificationStatus } from '../database/entities/captain-profile.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
@@ -48,9 +48,10 @@ export class OffersService {
     if (
       !captainProfile ||
       !captainProfile.isActive ||
-      captainProfile.verificationStatus !== VerificationStatus.Approved
+      captainProfile.verificationStatus !== VerificationStatus.Approved ||
+      captainProfile.subscriptionStatus !== SubscriptionStatus.Active
     ) {
-      throw new ForbiddenException('حساب الكابتن غير مفعل أو لم يتم التحقق منه بعد');
+      throw new ForbiddenException('حساب الكابتن غير مؤهل لتقديم العروض: تأكد من التوثيق والتفعيل واشتراك ساري المفعول');
     }
 
     const order = await this.ordersRepo.findOne({ where: { id: orderId } });
