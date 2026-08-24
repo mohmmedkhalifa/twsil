@@ -129,7 +129,28 @@ export class AdminService {
       .leftJoinAndSelect('c.user', 'user')
       .orderBy('c.createdAt', 'DESC');
     if (status) qb.where('c.verificationStatus = :status', { status });
-    return qb.getMany();
+    const profiles = await qb.getMany();
+
+    // Attach each captain's latest subscription receipt so the admin
+    // documents dialog can show the transfer receipt alongside the ID
+    // card and license images.
+    const captainIds = profiles.map((p) => p.userId);
+    const latestSubs = new Map<string, string | null>();
+    if (captainIds.length > 0) {
+      const subs = await this.subsRepo
+        .createQueryBuilder('s')
+        .where('s.captainId IN (:...ids)', { ids: captainIds })
+        .orderBy('s.createdAt', 'DESC')
+        .getMany();
+      for (const s of subs) {
+        if (!latestSubs.has(s.captainId)) latestSubs.set(s.captainId, s.receiptImageUrl);
+      }
+    }
+
+    return profiles.map((p) => ({
+      ...p,
+      subscriptionReceiptUrl: latestSubs.get(p.userId) ?? null,
+    }));
   }
 
   async captainDetail(captainProfileId: string) {

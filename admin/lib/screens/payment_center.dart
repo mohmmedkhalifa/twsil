@@ -27,7 +27,9 @@ class _PaymentCenterState extends State<PaymentCenter> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    // Silent refresh when data is already on screen: polling must not
+    // flash the full-screen spinner every few seconds.
+    if (_payments.isEmpty && _subscriptions.isEmpty) setState(() => _loading = true);
     try {
       final p = await AApi.instance.get('/orders/admin/payments', query: {
         if (_filter != 'all') 'status': _filter,

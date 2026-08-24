@@ -180,6 +180,7 @@ class Order {
   final String dropoffAddress;
   final String packageDescription;
   final String packageSize;
+  final double weightKg;
   final double distanceKm;
   final double deliveryFee;
   final double serviceFee;
@@ -208,6 +209,7 @@ class Order {
     required this.dropoffAddress,
     required this.packageDescription,
     required this.packageSize,
+    required this.weightKg,
     required this.distanceKm,
     required this.deliveryFee,
     required this.serviceFee,
@@ -247,6 +249,10 @@ class Order {
       dropoffAddress: json['dropoffAddress']?.toString() ?? '',
       packageDescription: json['packageDescription']?.toString() ?? '',
       packageSize: json['packageSize']?.toString() ?? 'medium',
+      weightKg: (json['weightKg'] as num?)?.toDouble() ??
+          (json['weight_kg'] as num?)?.toDouble() ??
+          double.tryParse(json['weightKg']?.toString() ?? '') ??
+          0.0,
       distanceKm: (json['distanceKm'] as num?)?.toDouble() ??
           (json['distance_km'] as num?)?.toDouble() ??
           double.tryParse(json['distanceKm']?.toString() ?? '') ??
@@ -298,7 +304,7 @@ class Order {
 
   String get packageSizeText => packageSizeLabel(packageSize);
 
-  double get weightKg => 1.0;
+  double get displayWeightKg => weightKg > 0 ? weightKg : 1.0;
 
   static String formatDistance(double km) {
     if (km <= 0) return '0 متر';
@@ -393,6 +399,8 @@ class AppNotification {
   final String body;
   final bool isRead;
   final DateTime createdAt;
+  final String? orderId;
+  final String? conversationId;
 
   const AppNotification({
     required this.id,
@@ -401,16 +409,32 @@ class AppNotification {
     required this.body,
     required this.isRead,
     required this.createdAt,
+    this.orderId,
+    this.conversationId,
   });
 
-  factory AppNotification.fromJson(Map<String, dynamic> json) => AppNotification(
-        id: json['id'] as String,
-        type: json['type'] as String? ?? '',
-        title: json['title'] as String? ?? '',
-        body: json['body'] as String? ?? '',
-        isRead: json['isRead'] as bool? ?? false,
-        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
-      );
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    // Backend stores the payload as a JSON string.
+    Map<String, dynamic> data = {};
+    final raw = json['data'];
+    if (raw is String && raw.isNotEmpty) {
+      try {
+        data = Map<String, dynamic>.from(jsonDecode(raw));
+      } catch (_) {}
+    } else if (raw is Map) {
+      data = Map<String, dynamic>.from(raw);
+    }
+    return AppNotification(
+      id: json['id'] as String,
+      type: json['type'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      isRead: json['isRead'] as bool? ?? false,
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      orderId: (data['orderId'] ?? data['captainProfileId'])?.toString(),
+      conversationId: data['conversationId']?.toString(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

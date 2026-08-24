@@ -26,7 +26,8 @@ class _CaptainsPageState extends State<CaptainsPage> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    // Silent refresh: keep current rows visible while polling.
+    if (_captains.isEmpty) setState(() => _loading = true);
     try {
       final c = await AApi.instance.get('/admin/captains') as List;
       if (!mounted) return;

@@ -290,6 +290,19 @@ export class OrdersService {
    * identity/contact details are intentionally NOT included before an
    * order is assigned.
    */
+  /**
+   * A single open request for captains (used by notification deep-links).
+   * Same eligibility rules as the pool; customer PII is never included.
+   */
+  async availableOrderDetail(captainId: string, orderId: string) {
+    await this.availableOrders(captainId); // enforces captain eligibility
+    const order = await this.ordersRepo.findOne({
+      where: { id: orderId, status: OrderStatus.AwaitingCaptain },
+    });
+    if (!order) throw new NotFoundException('هذا الطلب لم يعد متاحاً');
+    return order;
+  }
+
   async availableOrders(captainId: string) {
     const user = await this.usersRepo.findOne({
       where: { id: captainId },

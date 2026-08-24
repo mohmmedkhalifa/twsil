@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/models.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/network/socket_service.dart';
 import '../../core/widgets/ui_components.dart';
+import '../auth/auth_cubit.dart';
+import '../captain/captain_request_detail_screen.dart';
+import '../orders/chat_screen.dart';
+import '../orders/order_track_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -102,26 +107,81 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           ),
                           onTap: () async {
                             await ApiClient.instance.patch('/notifications/${n.id}/read');
-                            setState(() {
-                              final idx = _notifications.indexWhere((x) => x.id == n.id);
-                              if (idx >= 0) {
-                                final copy = _notifications[idx];
-                                _notifications[idx] = AppNotification(
-                                  id: copy.id,
-                                  type: copy.type,
-                                  title: copy.title,
-                                  body: copy.body,
-                                  isRead: true,
-                                  createdAt: copy.createdAt,
-                                );
-                              }
-                            });
+                            if (mounted) {
+                              setState(() {
+                                final idx = _notifications.indexWhere((x) => x.id == n.id);
+                                if (idx >= 0) {
+                                  final copy = _notifications[idx];
+                                  _notifications[idx] = AppNotification(
+                                    id: copy.id,
+                                    type: copy.type,
+                                    title: copy.title,
+                                    body: copy.body,
+                                    isRead: true,
+                                    createdAt: copy.createdAt,
+                                    orderId: copy.orderId,
+                                    conversationId: copy.conversationId,
+                                  );
+                                }
+                              });
+                            }
+                            _openNotificationTarget(n);
                           },
                         ),
                       );
                     },
                   ),
                 ),
+    );
+  }
+
+  /// Navigates to the screen relevant to the notification content.
+  /// Captains are taken to the open request itself (fetched through the
+  /// captain-only available endpoint); both parties go to tracking/chat.
+  Future<void> _openNotificationTarget(AppNotification n) async {
+    final role = context.read<AuthCubit>().state.user?.role ?? 'customer';
+    final isCaptain = role == 'captain';
+
+    // Chat message -> open the conversation directly.
+    if ((n.type.startsWith('chat') || n.type.startsWith('message')) &&
+        n.conversationId != null &&
+        n.orderId != null) {
+      if (!mounted) return;
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => ChatScreen(orderId: n.orderId!, conversationId: n.conversationId),
+      ));
+      return;
+    }
+
+    if (n.orderId == null || n.orderId!.isEmpty) return;
+
+    // A brand-new open request for captains: fetch it from the captain-only
+    // pool endpoint so eligibility is still enforced by the backend.
+    if (isCaptain &&
+        (n.type == 'order:created' ||
+            n.type == 'direct_request:new' ||
+            n.type.startsWith('order:payment'))) {
+      try {
+        final json = await ApiClient.instance.get('/orders/available/${n.orderId}');
+        if (!mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) =>
+              CaptainRequestDetailScreen(order: Order.fromJson(json as Map<String, dynamic>)),
+        ));
+      } catch (_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('لم يعد هذا الطلب متاحاً حالياً')),
+        );
+      }
+      return;
+    }
+
+    // Otherwise, if the user participates in the order, the tracking
+    // screen works for both roles.
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => OrderTrackScreen(orderId: n.orderId!)),
     );
   }
 

@@ -22,9 +22,7 @@ export class SubmitVerificationDto {
   nationalIdCardImageUrl: string;
   licenseImageUrl?: string;
   nationalId?: string;
-}
-
-@Injectable()
+}@Injectable()
 export class CaptainsService {
   constructor(
     @InjectRepository(CaptainProfile)
@@ -129,6 +127,9 @@ export class CaptainsService {
       verificationStatus: VerificationStatus.Pending,
       verificationNote: null,
       nationalId: dto.nationalId ?? profile.nationalId,
+      // Persist the uploaded document URLs so the admin panel can review them.
+      nationalIdCardImageUrl: dto.nationalIdCardImageUrl,
+      licenseImageUrl: dto.licenseImageUrl ?? profile.licenseImageUrl,
     });
 
     const admins = await this.usersRepo.find({ where: { role: UserRole.Admin } });

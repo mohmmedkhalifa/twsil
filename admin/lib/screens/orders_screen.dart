@@ -51,7 +51,8 @@ class _OrdersPageState extends State<OrdersPage> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    // Silent refresh: keep current rows visible while polling.
+    if (_orders.isEmpty) setState(() => _loading = true);
     try {
       final o = await AApi.instance.get('/orders/admin/list', query: {
         if (_filter.isNotEmpty) 'status': _filter,
@@ -172,21 +173,39 @@ class _OrdersPageState extends State<OrdersPage> with PollingMixin {
   }
 
   Widget _buildPaymentNotice(Map<String, dynamic> o) {
-    final payments = (o['payments'] as List? ?? []);
-    final Map<String, dynamic> payment = payments.isNotEmpty
-        ? Map<String, dynamic>.from(payments.last as Map)
-        : {};
+    final payments = (o['payments'] as List? ?? [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    // Newest first so the latest attempt drives what the admin sees.
+    payments.sort((a, b) => (b['createdAt']?.toString() ?? '')
+        .compareTo(a['createdAt']?.toString() ?? ''));
 
-    final receiptUrl = payment['receiptImageUrl'] ??
-        payment['receipt_image_url'] ??
-        payment['receiptUrl'] ??
-        o['receiptImageUrl'] ??
-        '';
+    // Prefer a receipt that is actually waiting for review; otherwise the
+    // most recent payment. Receipt image falls back to ANY payment that
+    // has one, so images never silently disappear.
+    Map<String, dynamic> payment = payments.isNotEmpty ? payments.first : {};
+    for (final p in payments) {
+      final st = p['status']?.toString();
+      if (st == 'under_review' || st == 'payment_submitted') {
+        payment = p;
+        break;
+      }
+    }
+    String receiptUrl = '';
+    for (final p in [...payments]) {
+      final r = (p['receiptImageUrl'] ?? p['receipt_image_url'] ?? p['receiptUrl'])?.toString() ?? '';
+      if (r.isNotEmpty) {
+        receiptUrl = r;
+        break;
+      }
+    }
 
     final txnNum = payment['transactionNumber'] ?? payment['transaction_number'] ?? '';
     final method = payment['paymentMethod'] ?? payment['payment_method'] ?? o['paymentMethod'] ?? '';
-    final payStatus = payment['status']?.toString() ?? o['paymentStatus']?.toString() ?? 'payment_pending';
+    final payStatus = payment['status']?.toString() ?? '';
     final payId = payment['id']?.toString() ?? '';
+    final hasPending = payments.any((p) =>
+        p['status'] == 'under_review' || p['status'] == 'payment_submitted');
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -257,7 +276,7 @@ class _OrdersPageState extends State<OrdersPage> with PollingMixin {
               ),
             ),
 
-          if (payId.isNotEmpty && (payStatus == 'payment_submitted' || payStatus == 'under_review' || payStatus == 'payment_pending')) ...[
+          if (hasPending && payId.isNotEmpty) ...[
             const SizedBox(height: 10),
             Row(
               children: [

@@ -24,7 +24,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    // Silent refresh: keep current rows visible while polling.
+    if (_complaints.isEmpty) setState(() => _loading = true);
     try {
       final c = await AApi.instance.get('/complaints/admin/list') as List;
       if (!mounted) return;

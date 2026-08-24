@@ -10,6 +10,7 @@ import '../orders/orders_cubit.dart';
 import '../orders/order_widgets.dart';
 import '../orders/order_track_screen.dart';
 import '../orders/create_order_screen.dart';
+import '../chat/conversations_screen.dart';
 
 import 'public_captain_profile_sheet.dart';
 import '../../core/models.dart';
@@ -87,6 +88,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
       appBar: AppBar(
         title: Text(isCaptain ? 'طلباتي الكابتن' : 'الرئيسية'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline, size: 20),
+            tooltip: 'الرسائل',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ConversationsScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh, size: 20),
             onPressed: _load,

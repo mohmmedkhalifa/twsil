@@ -6,6 +6,7 @@ import '../../core/status_labels.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_components.dart';
 import '../auth/auth_cubit.dart';
+import '../chat/conversations_screen.dart';
 import 'verification_screen.dart';
 import 'subscription_screen.dart';
 
@@ -87,6 +88,13 @@ class _CaptainDashboardScreenState extends State<CaptainDashboardScreen> {
           appBar: AppBar(
             title: const Text('لوحة التحكم بالكابتن'),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.chat_bubble_outline, size: 20),
+                tooltip: 'الرسائل',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ConversationsScreen()),
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.refresh, size: 20),
                 onPressed: () async {

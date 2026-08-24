@@ -10,6 +10,7 @@ import '../orders/order_widgets.dart';
 import '../orders/order_track_screen.dart';
 
 import 'submit_offer_sheet.dart';
+import 'captain_request_detail_screen.dart';
 
 class AvailableOrdersScreen extends StatefulWidget {
   const AvailableOrdersScreen({super.key});
@@ -82,7 +83,7 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => OrderTrackScreen(orderId: order.id),
+                            builder: (_) => CaptainRequestDetailScreen(order: order),
                           ),
                         );
                       },

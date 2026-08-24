@@ -24,7 +24,8 @@ class _ReviewsPageState extends State<ReviewsPage> with PollingMixin {
   void onPoll() => _load();
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    // Silent refresh: keep current rows visible while polling.
+    if (_reviews.isEmpty) setState(() => _loading = true);
     try {
       final r = await AApi.instance.get('/admin/reviews') as List;
       if (!mounted) return;

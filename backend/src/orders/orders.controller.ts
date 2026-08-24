@@ -35,6 +35,12 @@ export class OrdersController {
     return this.orders.availableOrders(user.id);
   }
 
+  @Get('available/:id')
+  @Roles(UserRole.Captain)
+  availableDetail(@CurrentUser() user: { id: string }, @Param('id') id: string) {
+    return this.orders.availableOrderDetail(user.id, id);
+  }
+
   @Post(':id/payments')
   @Roles(UserRole.Customer)
   submitPayment(@CurrentUser() user: { id: string }, @Param('id') id: string, @Body() dto: SubmitOrderPaymentDto) {
